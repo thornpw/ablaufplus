@@ -1,0 +1,13 @@
+{
+  "name": "simplegame2",
+  "version": "0.1",
+  "author": "Thorsten Butschke ^ Pionierwerk",
+  "year_of_release": "2016",
+  "width": 0,
+  "height": 0,
+  "fps": 0,
+  "inputmappings":  [],
+  "reaction_delay": 0,
+  "kernel": "console_kernel",
+  "input_handler": "none_input_handler"
+}

@@ -1,0 +1,25 @@
+{
+  "name": "Ablauf+ SimplePyGame",
+  "version": "0.1",
+  "author": "Thorsten Butschke ^ Pionierwerk",
+  "year_of_release": "2016",
+  "width": 640,
+  "height": 480,
+  "fps": 0,
+  "inputmappings":  [],
+  "kernel": "pygamekern",
+  "input_handler": "steuer",
+  "inputmappings":  [],
+  "reaction_delay": 15,
+  "backend" : {
+    "use": true,
+    "path": {
+      "file_name": "simplepygame.sqlite",
+      "use_home_directory": false,
+      "home_directory_name": ""
+    },
+    "objects": [
+      "test"
+    ]
+  }
+}

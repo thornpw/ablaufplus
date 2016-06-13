@@ -1,0 +1,13 @@
+{
+  "name": "{{projectname}}",
+  "version": "0.1",
+  "author": "Master Coder ^ Ablauf Coder Masters",
+  "year_of_release": "2016",
+  "width": 800,
+  "height": 800,
+  "fps": 0,
+  "inputmappings":  [],
+  "reaction_delay": 0,
+  "kernel": "{{kernel}}",
+  "input_handler": "{{input_handler}}"
+}

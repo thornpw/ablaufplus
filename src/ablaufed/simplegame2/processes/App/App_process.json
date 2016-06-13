@@ -1,0 +1,49 @@
+{
+  "states": [
+    {
+      "exit_transition": {
+        "destination": "Menu",
+        "type": "Jump"
+      },
+      "type": "Task",
+      "name": "Init"
+    },
+    {
+      "exit_transition": {
+        "destination": "Menu_choice",
+        "type": "Transit"
+      },
+      "type": "Task",
+      "name": "Menu"
+    },
+    {
+      "exit_transition": {
+        "destination": "Highscore",
+        "type": "Transit"
+      },
+      "type": "Task",
+      "name": "Game"
+    },
+    {
+      "exit_transition": {
+        "destination": "Menu",
+        "type": "Jump"
+      },
+      "type": "Task",
+      "name": "Highscore"
+    },
+    {
+      "type": "InclusiveGateway",
+      "name": "Menu_choice",
+      "default_transition": {
+        "destination": "Game",
+        "type": "Jump"
+      },
+      "choices": {
+        "Jump": "end",
+        "Transit": "Game"
+      }
+    }
+  ],
+  "namespace": "app"
+}

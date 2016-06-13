@@ -1,0 +1,8 @@
+{
+  "namespace": "appmain", "states":
+  [
+    {"name": "Init", "type": "Task",
+      "exit_transition": {"type": "Jump","destination": "end"}
+    }
+  ]
+}
