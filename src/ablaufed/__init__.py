@@ -520,7 +520,7 @@ def parse_tokens(tokens,data):
                                         template = template.render()
                                         save_filled_template(os.path.join(_project_name, "processes", "__init__.py"), template)
 
-                                        # app process
+                                        # App process
                                         create_process(_project_name, "App", _first_state)
                                         print("project successful created in {0}".format(os.path.join(os.getcwd(), _project_name)))
                                     else:

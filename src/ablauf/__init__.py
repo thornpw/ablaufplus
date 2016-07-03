@@ -792,19 +792,19 @@ def init():
                 try:
                     Automate.custom_views[_process_name] = importlib.import_module("processes." + _process_name + "." + _process_name + "_views")
                     logger.debug("[ok] {0}_views loaded".format(_process_name))
-                except ImportError:
+                except ImportError as ex:
                     logger.error("[ERROR!] Did not found {0}_views".format(_process_name))
 
                 try:
                     Automate.custom_controllers[_process_name] = importlib.import_module("processes." + _process_name + "." + _process_name + "_controllers")
                     logger.debug("[ok] {0}_controllers loaded".format(_process_name))
-                except ImportError:
+                except ImportError as ex:
                     logger.error("[ERROR!] Did not found {0}_controllers".format(_process_name))
 
                 try:
                     Automate.custom_models[_process_name] = importlib.import_module("processes." + _process_name + "." + _process_name + "_models")
                     logger.debug("[ok] {0}_models loaded".format(_process_name))
-                except ImportError:
+                except ImportError as ex:
                     logger.error("[ERROR!] Did not found {0}_models".format(_process_name))
 
                 # Import states from the states.json file
