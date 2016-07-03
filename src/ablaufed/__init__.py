@@ -66,9 +66,10 @@ def save_filled_template(path, template):
 
 def save_filled_json_template(path, template,data):
     _json = json.loads(template)
+    _data = json.loads(data)
 
     for element in _data:
-        _json[element] = data[element]
+        _json[element] = _data[element]
 
 
     with open(path, 'w') as outfile:
@@ -93,38 +94,38 @@ def add_json_data(path,object_name,iterations,data):
     # do the iterations
     for abl_counter in range(0,iterations):
         # make deep copy of the data to _data
-        _data = deepcopy(data)
+        _data = json.loads(data)
 
         # preprocessing
-        if isinstance(data,list):
-            for _counter in range(0,data.__len__()):
-                if isinstance(data[_counter],unicode):
+        if isinstance(_data,list):
+            for _counter in range(0,_data.__len__()):
+                if isinstance(_data[_counter],unicode):
                     if _data[_counter] == "#ABL_COUNTER#":
                         _data[_counter] = abl_counter
                     elif _data[_counter] == "#ABL_COUNTER1#":
                         _data[_counter] = abl_counter+1
 
-        elif isinstance(data,str):
-            if isinstance(data,unicode):
-                if _data == "#ABL_COUNTER#":
-                    _data = abl_counter
-                if _data == "#ABL_COUNTER1#":
-                    _data = abl_counter + 1
+        if isinstance(_data,unicode):
+            if _data == "#ABL_COUNTER#":
+                _data = abl_counter
+            if _data == "#ABL_COUNTER1#":
+                _data = abl_counter + 1
 
-        elif isinstance(data,dict):
-            for element in data:
-                if isinstance(data[element],unicode):
-                    if _data[element] == "#ABL_COUNTER#":
-                        _data[element] = abl_counter
-                    elif _data[element] == "#ABL_COUNTER1#":
-                        _data[element] = abl_counter+1
+        elif isinstance(_data,dict):
+            for element in _data:
+                if _data[element] == "#ABL_COUNTER#":
+                    _data[element] = abl_counter
+                if _data[element] == "#ABL_COUNTER1#":
+                    _data[element] = abl_counter + 1
 
 
         if iterations == 1:
-            exec("_json{0} = _data".format(object_name))
+            if isinstance(_data,unicode):
+                exec ("_json{0} = '{1}'".format(object_name, _data))
+            else:
+                exec("_json{0} = {1}".format(object_name, _data))
         else:
-            exec("_json{0}.append(_data)".format(object_name,abl_counter))
-
+            exec("_json{0}.append({1})".format(object_name, _data))
 
     try:
         with open(_temp_path, 'w') as outfile:
@@ -184,7 +185,7 @@ def parse_tokens(tokens,data):
 
                     if os.path.exists(_path_to_data):
                         add_json_data(_path_to_data,_object_name,_iterations,data)
-                        print("JSON data added")
+                        print("JSON data added:{0}".format(_object_name))
                     else:
                         print("data file:{0} does not exists".format(_path_to_data))
                 else:
@@ -217,9 +218,10 @@ def parse_tokens(tokens,data):
                                 children = _temp_data["children"]
                                 new_code = subcontroller_template.render(containername=_container_name)
                                 new_code_json = json.loads(new_code)
+                                _data_as_json = json.loads(data)
 
-                                for element in data:
-                                    new_code_json[element] = data[element]
+                                for element in _data_as_json:
+                                    new_code_json[element] = _data_as_json[element]
 
                                 if children.__len__() <= _row:
                                     # add new row and column. the column parameter will be interpreted as 0
@@ -247,7 +249,7 @@ def parse_tokens(tokens,data):
                                 except Exception as ex:
                                     print("Error during creation of file: {0}".format(_file))
 
-                                print("container added successful")
+                                print("container added successful:{0}".format(_container_name))
                         else:
                             print("User task:{0} does not exists".format(_user_task))
                     else:
@@ -344,11 +346,11 @@ def parse_tokens(tokens,data):
                             # apn
                             json_data = open(os.path.join(ablauf_environment["current_project"], "processes", tokens[3], "App_process.json")).read()
 
-                            data = json.loads(json_data)
+                            _json_data = json.loads(json_data)
                             new_task = {'name': tokens[4], 'type': 'Task', 'exit_transition': {'type': tokens[6], 'destination': tokens[7]}}
-                            data["states"].append(new_task)
+                            _json_data["states"].append(new_task)
                             with open(os.path.join(ablauf_environment["current_project"], "processes", tokens[3], "App_process.json"), 'w') as outfile:
-                                json.dump(data, outfile)
+                                json.dump(_json_data, outfile)
                             print("user task controller added successful")
                         else:
                             print("Workflow does not exists")
@@ -560,14 +562,19 @@ if sys.argv.__len__() == 2:
             for line in file:
                 if line.__len__() > 0 and not line.startswith("#"):
                     line = line[0:-1]
-                    if "\"" in line:
-                        _parts = line.split(" \"")
-                        if _parts.__len__() >  1:
+                    if "'" in line:
+                        _parts = line.split("'", 1)
+                        if _parts.__len__() > 1:
                             _tokens = _parts[0].split(" ")
-                            _parts[1] = _parts[1].replace("\'","\"")
-                            _parts[1] = _parts[1][0:-1]
-                            _data = json.loads(_parts[1])
-                            parse_tokens(_tokens,_data)
+                            _tokens = _tokens[:-1]
+                            _data = _parts[1][0:-1]
+                            parse_tokens(_tokens, _data)
+                        #if _parts.__len__() >  1:
+                        #    _tokens = _parts[0].split(" ")
+                        #    #_parts[1] = _parts[1].replace("\'","\"")
+                        #    _parts[1] = _parts[1][:-1]
+                        #    _data = json.loads(_parts[1])
+                        #    parse_tokens(_tokens,_data)
                     else:
                         _tokens = line.split(" ")
                         _data = None
@@ -579,11 +586,12 @@ else:
     # interactive mode
     while True:
         tokens = raw_input("do:")
-        if "\"" in tokens:
-            _parts = tokens.split("\"")
+        if "'" in tokens:
+            _parts = tokens.split("'", 1)
             if _parts.__len__() >  1:
                 _tokens = _parts[0].split(" ")
-                _data = _parts[1]
+                _tokens = _tokens[:-1]
+                _data = _parts[1][0:-1]
                 parse_tokens(_tokens,_data)
         else:
             _tokens = tokens.split(" ")

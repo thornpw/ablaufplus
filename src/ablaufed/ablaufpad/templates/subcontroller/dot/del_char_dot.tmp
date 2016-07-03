@@ -1,0 +1,85 @@
+     {
+        "actual_segment": 0,
+        "rows": 1,
+        "name": "{{containername}}",
+        "class": "DelChar",
+        "y_offset": 0,
+        "x_offset": 0,
+        "visible_columns": 1,
+        "y": 0,
+        "x": 0,
+        "visible_rows": 1,
+        "input_mappings": [
+            {
+                "Pad": null,
+                "Key": "K_LEFT",
+                "Controller": "segment_left",
+                "Model": {}
+            },
+            {
+                "Pad": null,
+                "Key": "K_RIGHT",
+                "Controller": "segment_right",
+                "Model": {}
+            },
+            {
+                "Pad": null,
+                "Key": "K_UP",
+                "Controller": "segment_up",
+                "Model": {}
+            },
+            {
+                "Pad": null,
+                "Key": "K_DOWN",
+                "Controller": "segment_down",
+                "Model": {}
+            },
+            {
+                "Pad": "SHOULDER_L1",
+                "Key": "K_a",
+                "Controller": "games_page_down",
+                "Model": {}
+            },
+            {
+                "Pad": "SHOULDER_R1",
+                "Key": "K_s",
+                "Controller": "games_page_up",
+                "Model": {}
+            },
+            {
+                "Pad": "BUTTON_DOWN",
+                "Key": "K_SPACE",
+                "Controller": "button_down",
+                "Model": {}
+            }
+        ],
+        "polling": [
+            {
+                "Action": "DPAD_LEFT",
+                "Controller": "segment_left",
+                "Model": {}
+            },
+            {
+                "Action": "DPAD_RIGHT",
+                "Controller": "segment_right",
+                "Model": {}
+            },
+            {
+                "Action": "DPAD_TOP",
+                "Controller": "segment_up",
+                "Model": {}
+            },
+            {
+                "Action": "DPAD_DOWN",
+                "Controller": "segment_down",
+                "Model": {}
+            }
+        ],
+        "navigation": {
+        },
+        "model": {
+            "destinations":[]
+        },
+        "children": [],
+        "columns": 1
+     }

@@ -5,11 +5,12 @@
         else:
             _color = self.model.color_text
 
-        if "text" in segment.model and "data" in segment.model:
+        if "text" in segment.model:
             _session_data = ""
-            for _element in segment.model["data"]:
-                _session_data += "ablauf.Data.session" + _element +","
-            _session_data = _session_data[:-1]
+            if "data" in segment.model:
+                for _element in segment.model["data"]:
+                    _session_data += "ablauf.Data.session" + _element +","
+                _session_data = _session_data[:-1]
 
             exec("_text = '{0}'.format({1})".format(segment.model["text"],_session_data))
         else:
