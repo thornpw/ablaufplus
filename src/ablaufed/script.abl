@@ -3,8 +3,8 @@
 
 # create project
 # ******************************************************
-create project script74 pygamekern steuer menu
-connect project script74
+create project script19 pygamekern steuer Stema
+connect project script19
 
 # Model
 # ******************************************************
@@ -25,11 +25,42 @@ add json session ["tournament"] 8 '{"updown":"", "last_place": -1, "place": 0, "
 
 # Controllers
 # ******************************************************
+add controller subprocess App Stema Jump menu '{}'
 add controller usertask App menu menu_dialog Jump end '{"start_path": "menu_dialog/start/start_0_0"}'
 add controller usertask App options options_dialog Jump menu '{"start_path": "options_dialog/lives/lives_0_0"}'
 add controller usertask App credits credits_dialog Jump menu '{"start_path": "credits_dialog/exit/exit_0_0"}'
 add controller usertask App players players_dialog Jump menu '{"start_path": "players_dialog/player1/player1_0_0"}'
-add controller usertask App playername playername_dialog Jump menu '{"start_path": "playername_dialog/exit/exit_0_0"}'
+add controller usertask App playername playername_dialog Jump menu '{"start_path": "player                        # add subprocess controller
+                        # -------------------------------------------------------------------------------------------------------------
+                        # syntax: add controller subprocess [existing workflow] [new task name] [Jump|Transit] [Destination]
+                        # -------------------------------------------------------------------------------------------------------------
+                        if tokens.__len__() == 7:
+                            if os.path.exists(os.path.join(ablauf_environment["current_project"], "processes", tokens[3])):
+                                template = env.get_template('add_subprocess.tmp')
+                                new_code = template.render(workflow=tokens[3], name=tokens[4], mode=tokens[5], destination=tokens[6])
+                                add_code(os.path.join(ablauf_environment["current_project"], "processes", tokens[3], "App_controllers.py"), new_code)
+
+                                # model
+                                template = env.get_template('add_subprocess_model.tmp')
+                                new_code = template.render(taskname=tokens[4])
+                                add_code(os.path.join(ablauf_environment["current_project"], "processes", tokens[3], "App_models.py"), new_code)
+
+                                # apn
+                                json_data = open(os.path.join(ablauf_environment["current_project"], "processes", tokens[3], "App_process.json")).read()
+
+                                data = json.loads(json_data)
+                                new_task = {'name': tokens[4], 'type': 'Task', 'exit_transition': {'type': tokens[5], 'destination': tokens[6]}}
+                                data["states"].append(new_task)
+
+                                with open(os.path.join(ablauf_environment["current_project"], "processes", tokens[3], "App_process.json"), 'w') as outfile:
+                                    json.dump(data, outfile)
+
+                                print("subprocess controller added successful")
+                            else:
+                                print("Workflow does not exists")
+                        else:
+                            print("wrong number of arguments")
+name_dialog/exit/exit_0_0"}'
 add controller task App game_init Jump game '{}'
 add controller game App game Transit highscore '{}'
 add controller usertask App highscore highscore_dialog Jump menu '{"start_path": "highscore_dialog/exit/exit_0_0"}'

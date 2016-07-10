@@ -7,7 +7,7 @@
   "height": 800,
   "fps": 0,
   "inputmappings":  [],
-  "reaction_delay": 0,
+  "reaction_delay": 10,
   "kernel": "{{kernel}}",
   "input_handler": "{{input_handler}}"
 }

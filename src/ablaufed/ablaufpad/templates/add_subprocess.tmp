@@ -1,0 +1,13 @@
+
+
+# <ab> start id:{{name}}
+# {{name}} task
+# ****************************************************************************
+class {{name}}(ablauf.apmn.SubProcess):
+    def __init__(self, config):
+        ablauf.apmn.SubProcess.__init__(self, config)
+
+    def task(self):
+        pass
+# <ab> end id: {{name}}
+

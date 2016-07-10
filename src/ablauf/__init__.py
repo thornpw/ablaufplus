@@ -20,10 +20,14 @@ from sqlalchemy import create_engine
 
 # Initialize logging
 # **************************************************************************
-# load logger config
-logging.config.fileConfig(os.path.join(os.getcwd(), "logging.conf"))
-# create logger
-logger = logging.getLogger('Ablauf')
+if os.path.exists('logging.conf'):
+    # load logger config
+    logging.config.fileConfig(os.path.join(os.getcwd(), "logging.conf"))
+    # create logger
+    logger = logging.getLogger('Ablauf')
+else:
+    # no logger
+    logger = logging.getLogger('dummy')
 
 
 # The Data class
@@ -482,11 +486,11 @@ class APNState(State):
         self.model = None
         self.view = None
 
-        #try:
-        _process = Automate.actual_process_name_in_creation
-        exec ("self.model = Automate.custom_models[Automate.actual_process_name_in_creation]." + name + "Model(\"" + _process + "\",\"" + name + "\")")
-        #except Exception as ex:
-        #    logger.debug("no model found in state: {0}: {1} ".format(name, str(ex.message)))
+        try:
+            _process = Automate.actual_process_name_in_creation
+            exec ("self.model = Automate.custom_models[Automate.actual_process_name_in_creation]." + name + "Model(\"" + _process + "\",\"" + name + "\")")
+        except Exception as ex:
+            logger.debug("no model found in state: {0}: {1} ".format(name, str(ex.message)))
 
         # set view
         try:
