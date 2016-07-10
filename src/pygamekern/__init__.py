@@ -58,6 +58,9 @@ def init():
     # set windows name
     pygame.display.set_caption(ablauf.Data.configuration["name"] + " " + ablauf.Data.configuration["version"] + " - " + ablauf.Data.configuration["author"] + " " + ablauf.Data.configuration["year_of_release"])
 
+    # show or hide cursor
+    pygame.mouse.set_visible(ablauf.Data.configuration["cursor_visible"])
+
     # set clock
     Kernel.clock = pygame.time.Clock()
 

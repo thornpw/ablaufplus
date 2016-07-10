@@ -9,5 +9,6 @@
   "inputmappings":  [],
   "reaction_delay": 10,
   "kernel": "{{kernel}}",
-  "input_handler": "{{input_handler}}"
+  "input_handler": "{{input_handler}}",
+  "cursor_visible": false
 }
