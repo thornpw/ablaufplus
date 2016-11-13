@@ -117,6 +117,7 @@ class Automate(object):
     _actual_state_name_in_creation = None
     _kernel = None
     _input_handler = None
+    _image_cache = {}
 
     class __metaclass__(type):
         @property
@@ -222,6 +223,14 @@ class Automate(object):
         @actual_state_name_in_creation.setter
         def actual_state_name_in_creation(cls, value):
             cls._actual_state_name_in_creation = value
+
+        @property
+        def image_cache(cls):
+            return cls._image_cache
+
+        @image_cache.setter
+        def image_cache(cls, value):
+            cls._image_cache = value
 
     __active = False
 
@@ -396,6 +405,16 @@ class Automate(object):
             cls.kernel.screen_flip()
 
 
+class Controller(object):
+    @classmethod
+    def jump(cls, segment,action):
+        if str(action) in segment.input_mappings["padinputmappings"]:
+            Automate.jump(segment.input_mappings["padinputmappings"][str(action)]["Model"]["destination"])
+        elif str(action) in segment.input_mappings["keyinputmappings"]:
+            print(segment.input_mappings["keyinputmappings"][str(action)]["Model"]["destination"])
+            Automate.jump(segment.input_mappings["keyinputmappings"][str(action)]["Model"]["destination"])
+
+
 class Process(object):
     def __init__(self, name):
         self.name = name
@@ -539,9 +558,16 @@ class APNState(State):
         try:
             if str(action) in segment.input_mappings[mapping]:
                 try:
+                    print(segment.input_mappings[mapping][str(action)]["Controller"])
                     exec ("segment." + segment.input_mappings[mapping][str(action)]["Controller"] + "(segment)")
                 except Exception as ex:
-                     exec ("Automate.custom_controllers['Global']." + segment.input_mappings[mapping][str(action)]["Controller"] + "(segment)")
+                    try:
+                        exec ("Automate.custom_controllers['Global']." + segment.input_mappings[mapping][str(action)]["Controller"] + "(segment)")
+                    except Exception as ex:
+                        try:
+                            exec (segment.input_mappings[mapping][str(action)]["Controller"] + "(segment,action)")
+                        except Exception as ex:
+                            pass
             elif segment.parent.parent is not None:
                     self.is_event_defined_in_segment(action, segment.parent.parent.segments[segment.parent.parent.actual_segment], mapping)
         except Exception as ex:
@@ -688,6 +714,7 @@ class Model(object):
             _segment_x = _grid.x
 
             for _segment_column in range(0, att["columns"]):
+                print("sc:"+str(_segment_column) + str(att["columns"]))
                 _segment_name = _grid.name + "_" + str(_segment_column) + "_" + str(_segment_row)
 
                 _class = getattr(ablauf, "dot") #ToDo: split vom classname

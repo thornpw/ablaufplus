@@ -2,7 +2,7 @@ from distutils.core import setup
 
 setup(
         name='ablauf',
-        version='0.1.5',
+        version='0.1.7',
         license="GNU LGPLv3",
         description='A state machine implemented in python. Uses states and transitions. Enhanced wiht a MVC layer. The controllers are inspired by BPMN.',
         long_description=open("README.txt").read(),
@@ -40,9 +40,9 @@ setup(
             ],
         },
         install_requires = [
-            "SQLAlchemy",
-            "jsonmerge",
-            "Jinja2"
+            #"SQLAlchemy",
+            #"jsonmerge",
+            #"Jinja2"
         ],
         classifiers=[
             'License :: OSI Approved :: GNU Lesser General Public License v3 (LGPLv3)'

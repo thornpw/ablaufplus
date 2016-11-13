@@ -6,6 +6,7 @@ src/ablauf/__init__.py
 src/ablauf/apmn.py
 src/ablauf/dot.py
 src/ablauf/model.py
+src/ablauf/olddot.py
 src/ablauf/ablaufed/__init__.py
 src/ablauf/ablaufed/ablaufpad/__init__.py
 src/ablauf/ablaufed/ablaufpad/__init__.pyc
@@ -43,6 +44,9 @@ src/ablauf/ablaufed/ablaufpad/templates/Input_handler/Stema/configuration/transl
 src/ablauf/ablaufed/ablaufpad/templates/Input_handler/Stema/structure/ExplainUnknownWait.tmp
 src/ablauf/ablaufed/ablaufpad/templates/Input_handler/Stema/structure/IterateUnmappedControllers.tmp
 src/ablauf/ablaufed/ablaufpad/templates/Input_handler/Stema/structure/OnInitialized.tmp
+src/ablauf/ablaufed/ablaufpad/templates/subcontroller/dot/ButtonHorizontal_dot.tmp
+src/ablauf/ablaufed/ablaufpad/templates/subcontroller/dot/DPAD_dot.tmp
+src/ablauf/ablaufed/ablaufpad/templates/subcontroller/dot/SelectVertical_dot.tmp
 src/ablauf/ablaufed/ablaufpad/templates/subcontroller/dot/add_char_dot.tmp
 src/ablauf/ablaufed/ablaufpad/templates/subcontroller/dot/container_dot.tmp
 src/ablauf/ablaufed/ablaufpad/templates/subcontroller/dot/datagrid_dot.tmp
@@ -50,6 +54,9 @@ src/ablauf/ablaufed/ablaufpad/templates/subcontroller/dot/del_char_dot.tmp
 src/ablauf/ablaufed/ablaufpad/templates/subcontroller/dot/jump_dot.tmp
 src/ablauf/ablaufed/ablaufpad/templates/subcontroller/dot/numberoption_dot.tmp
 src/ablauf/ablaufed/ablaufpad/templates/subcontroller/dot/text_dot.tmp
+src/ablauf/ablaufed/ablaufpad/templates/subcontroller/views/ButtonHorizontal_view.tmp
+src/ablauf/ablaufed/ablaufpad/templates/subcontroller/views/DPAD_view.tmp
+src/ablauf/ablaufed/ablaufpad/templates/subcontroller/views/SelectVertical_view.tmp
 src/ablauf/ablaufed/ablaufpad/templates/subcontroller/views/add_char_view.tmp
 src/ablauf/ablaufed/ablaufpad/templates/subcontroller/views/container_view.tmp
 src/ablauf/ablaufed/ablaufpad/templates/subcontroller/views/datagrid_view.tmp
@@ -58,6 +65,7 @@ src/ablauf/ablaufed/ablaufpad/templates/subcontroller/views/jump_view.tmp
 src/ablauf/ablaufed/ablaufpad/templates/subcontroller/views/numberoption_view.tmp
 src/ablauf/ablaufed/ablaufpad/templates/subcontroller/views/text_view.tmp
 src/ablauf/ablaufed/examples/game.abl
+src/ablauf/ablaufed/examples/media_browser.abl
 src/ablauf/console_kernel/__init__.py
 src/ablauf/console_kernel/__init__.pyc
 src/ablauf/console_kernel/utils.py
@@ -102,4 +110,6 @@ src/ablauf/examples/simplegame/processes/App/__init__.pyc
 src/ablauf/none_input_handler/__init__.py
 src/ablauf/none_input_handler/__init__.pyc
 src/ablauf/pygamekern/__init__.py
+src/ablauf/pygamekern/__init__.pyc
 src/ablauf/pygamekern/utils.py
+src/ablauf/pygamekern/utils.pyc

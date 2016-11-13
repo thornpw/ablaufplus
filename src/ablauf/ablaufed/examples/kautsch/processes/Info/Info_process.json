@@ -1,1 +1,0 @@
-{"states": [{"exit_transition": {"destination": "info_form", "type": "Jump"}, "type": "Task", "name": "Init"}, {"exit_transition": {"destination": "library", "type": "Jump"}, "type": "UserTask", "name": "info_form"}], "namespace": "app"}

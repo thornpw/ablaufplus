@@ -4,6 +4,8 @@ import sys
 from jinja2 import Environment, PackageLoader
 from copy import deepcopy
 import jsonmerge
+from objectpath import *
+
 
 env = Environment(loader=PackageLoader('ablaufpad', 'templates'))
 
@@ -140,25 +142,79 @@ def add_json_data(path, object_name, iterations, data):
         print("Something went wrong to save:{0}".format(path))
 
 
+def add_json_element(path, parent, object_name, iterations, data):
+    _temp_path = path + "_temp"
+
+    # load data
+    with open(path, "r") as _file:
+        _json = json.load(_file)
+
+    # do the iterations
+    for abl_counter in range(0, iterations):
+        # make deep copy of the data to _data
+        _data = json.loads(data)
+        #_data = data
+
+        # preprocessing
+        if isinstance(_data, list):
+            for _counter in range(0, _data.__len__()):
+                if isinstance(_data[_counter], unicode):
+                    if _data[_counter] == "#ABL_COUNTER#":
+                        _data[_counter] = abl_counter
+                    elif _data[_counter] == "#ABL_COUNTER1#":
+                        _data[_counter] = abl_counter + 1
+
+        if isinstance(_data, unicode):
+            if _data == "#ABL_COUNTER#":
+                _data = abl_counter
+            if _data == "#ABL_COUNTER1#":
+                _data = abl_counter + 1
+
+        elif isinstance(_data, dict):
+            for element in _data:
+                if _data[element] == "#ABL_COUNTER#":
+                    _data[element] = abl_counter
+                if _data[element] == "#ABL_COUNTER1#":
+                    _data[element] = abl_counter + 1
+
+        if iterations == 1:
+            if isinstance(_data, unicode):
+                exec ("_json['{0}'] = '{1}'".format(object_name, _data))
+            else:
+                exec ("_json['{0}'] = {1}".format(object_name, _data))
+        else:
+            exec ("_json['{0}'].append({1})".format(object_name, _data))
+
+    try:
+        with open(_temp_path, 'w') as outfile:
+            json.dump(_json, outfile)
+
+        os.remove(path)
+        os.rename(_temp_path, path)
+
+    except Exception as ex:
+        print("Something went wrong to save:{0}".format(path))
+
+
 def create_process(project_path, process_name, first_state):
     # folder:   [process name]
     os.mkdir(os.path.join(project_path, "processes", process_name))
     # template: App_controllers.py
     template = env.get_template('App_controllers.tmp')
     template = template.render()
-    save_filled_template(os.path.join(project_path, "processes", process_name, "App_controllers.py"), template)
+    save_filled_template(os.path.join(project_path, "processes", process_name, process_name + "_controllers.py"), template)
     # template: App_models.py
     template = env.get_template('App_model.tmp')
     template = template.render()
-    save_filled_template(os.path.join(project_path, "processes", process_name, "App_models.py"), template)
+    save_filled_template(os.path.join(project_path, "processes", process_name, process_name + "_models.py"), template)
     # template: App_process.json
     template = env.get_template('App_process.tmp')
     template = template.render(first_state=first_state)
-    save_filled_template(os.path.join(project_path, "processes", process_name, "App_process.json"), template)
+    save_filled_template(os.path.join(project_path, "processes", process_name, process_name + "_process.json"), template)
     # template: App_views.py
     template = env.get_template('App_views.tmp')
     template = template.render()
-    save_filled_template(os.path.join(project_path, "processes", process_name, "App_views.py"), template)
+    save_filled_template(os.path.join(project_path, "processes", process_name, process_name + "_views.py"), template)
     # template: __init__.py
     template = env.get_template('empty.tmp')
     template = template.render()
@@ -240,18 +296,41 @@ def parse_tokens(tokens, data):
                 else:
                     print("wrong number of arguments:{0}. 2 arguments are exspected".format(tokens.__len__()))
 
+            if tokens[1] == "json_element":
+                # add a json object into a json file
+                # -------------------------------------------------------------------------------------------------------------
+                # syntax: add json_element [path] [None|parent] [object_name] [iterations] '[json]'
+                # -------------------------------------------------------------------------------------------------------------
+                if tokens.__len__() == 6:
+                    _path = tokens[2]
+                    _parent = tokens[3]
+                    _object_name = tokens[4]
+                    _iterations = int(tokens[5])
+                    _data = data
+
+                    _path_to_data = os.path.join(ablauf_environment["current_project"], str(_path))
+
+                    if os.path.exists(_path_to_data):
+                        add_json_element(_path_to_data, _parent, _object_name, _iterations, _data)
+                        print("JSON data added:{0}".format(_data))
+                    else:
+                        print("data file:{0} does not exists".format(_path_to_data))
+                else:
+                    print("wrong number of arguments:{0}. 7 arguments are exspected".format(tokens.__len__()))
+
             elif tokens[1] == "container":
                 # add a container into a dot
                 # -------------------------------------------------------------------------------------------------------------
-                # syntax: add container subcontroller-name [existing workflow] user-task container-name [row] [column]
+                # syntax: add container subcontroller-name [existing workflow] user-task container-name [row] [column] [parent]
                 # -------------------------------------------------------------------------------------------------------------
-                if tokens.__len__() == 8:
+                if tokens.__len__() == 9:
                     _subcontroller_name = tokens[2]
                     _workflow = tokens[3]
                     _user_task = tokens[4]
                     _container_name = tokens[5]
                     _row = int(tokens[6])
                     _column = int(tokens[7])
+                    _parent = tokens[8]
 
                     if os.path.exists(os.path.join(ablauf_environment["current_project"], "processes", _workflow)):
                         _file = os.path.join(ablauf_environment["current_project"], "processes", _workflow, "structure", _user_task + ".json")
@@ -264,7 +343,14 @@ def parse_tokens(tokens, data):
                                 # dot
                                 json_data = open(_file).read()
                                 _temp_data = json.loads(json_data)
+
                                 children = _temp_data["children"]
+
+                                if _parent != "None":
+                                    exec("children = _temp_data" + _parent)
+                                    print("childes:" + str(children))
+
+
                                 new_code = subcontroller_template.render(containername=_container_name)
                                 new_code_json = json.loads(new_code)
                                 _data_as_json = json.loads(data)
@@ -289,7 +375,7 @@ def parse_tokens(tokens, data):
                                     print("Error during creation of file: {0}".format(_file))
 
                                 # view
-                                _file = os.path.join(ablauf_environment["current_project"], "processes", _workflow, "App_views.py")
+                                _file = os.path.join(ablauf_environment["current_project"], "processes", _workflow, _workflow + "_views.py")
 
                                 template = env.get_template("subcontroller/views/{0}_view.tmp".format(_subcontroller_name))
                                 new_code = template.render(containername=_container_name, row=_row, column=_column)
@@ -305,7 +391,7 @@ def parse_tokens(tokens, data):
                     else:
                         print("Workflow:{0} does not exists".format(_workflow))
                 else:
-                    print("wrong number of arguments:{0}. 8 arguments are exspected".format(tokens.__len__()))
+                    print("wrong number of arguments:{0}. 9 arguments are exspected".format(tokens.__len__()))
 
             elif tokens[1] == "controller":
                 if tokens[2] == "task":
@@ -317,21 +403,21 @@ def parse_tokens(tokens, data):
                         if os.path.exists(os.path.join(ablauf_environment["current_project"], "processes", tokens[3])):
                             template = env.get_template('add_game.tmp')
                             new_code = template.render(workflow=tokens[3], name=tokens[4], mode=tokens[5], destination=tokens[6])
-                            add_code(os.path.join(ablauf_environment["current_project"], "processes", tokens[3], "App_controllers.py"), new_code)
+                            add_code(os.path.join(ablauf_environment["current_project"], "processes", tokens[3], tokens[3] + "_controllers.py"), new_code)
 
                             # model
                             template = env.get_template('add_game_model.tmp')
                             new_code = template.render(taskname=tokens[4])
-                            add_code(os.path.join(ablauf_environment["current_project"], "processes", tokens[3], "App_models.py"), new_code)
+                            add_code(os.path.join(ablauf_environment["current_project"], "processes", tokens[3], tokens[3] + "_models.py"), new_code)
 
                             # apn
-                            json_data = open(os.path.join(ablauf_environment["current_project"], "processes", tokens[3], "App_process.json")).read()
+                            json_data = open(os.path.join(ablauf_environment["current_project"], "processes", tokens[3], tokens[3] + "_process.json")).read()
 
                             data = json.loads(json_data)
                             new_task = {'name': tokens[4], 'type': 'Task', 'exit_transition': {'type': tokens[5], 'destination': tokens[6]}}
                             data["states"].append(new_task)
 
-                            with open(os.path.join(ablauf_environment["current_project"], "processes", tokens[3], "App_process.json"), 'w') as outfile:
+                            with open(os.path.join(ablauf_environment["current_project"], "processes", tokens[3], tokens[3] + "_process.json"), 'w') as outfile:
                                 json.dump(data, outfile)
 
                             print("task controller added successful")
@@ -350,20 +436,20 @@ def parse_tokens(tokens, data):
                             # controller
                             template = env.get_template('add_subprocess.tmp')
                             new_code = template.render(workflow=tokens[3], name=tokens[4], mode=tokens[5], destination=tokens[6])
-                            add_code(os.path.join(ablauf_environment["current_project"], "processes", tokens[3], "App_controllers.py"), new_code)
+                            add_code(os.path.join(ablauf_environment["current_project"], "processes", tokens[3], tokens[3] + "_controllers.py"), new_code)
 
                             # model
                             template = env.get_template('add_subprocess_model.tmp')
                             new_code = template.render(taskname=tokens[4])
-                            add_code(os.path.join(ablauf_environment["current_project"], "processes", tokens[3], "App_models.py"), new_code)
+                            add_code(os.path.join(ablauf_environment["current_project"], "processes", tokens[3], tokens[3] + "_models.py"), new_code)
 
                             # apn
-                            json_data = open(os.path.join(ablauf_environment["current_project"], "processes", tokens[3], "App_process.json")).read()
+                            json_data = open(os.path.join(ablauf_environment["current_project"], "processes", tokens[3], tokens[3] + "_process.json")).read()
                             data = json.loads(json_data)
                             new_task = {'name': tokens[4], 'type': 'SubProcess', 'exit_transition': {'type': tokens[5], 'destination': tokens[6]}}
                             data["states"].append(new_task)
 
-                            with open(os.path.join(ablauf_environment["current_project"], "processes", tokens[3], "App_process.json"), 'w') as outfile:
+                            with open(os.path.join(ablauf_environment["current_project"], "processes", tokens[3], tokens[3] + "_process.json"), 'w') as outfile:
                                 json.dump(data, outfile)
 
                             print("subprocess controller added successful")
@@ -382,20 +468,20 @@ def parse_tokens(tokens, data):
                             template = env.get_template('add_task.tmp')
                             new_code = template.render(workflow=tokens[3], name=tokens[4], mode=tokens[5],
                                                        destination=tokens[6])
-                            add_code(os.path.join(ablauf_environment["current_project"], "processes", tokens[3], "App_controllers.py"), new_code)
+                            add_code(os.path.join(ablauf_environment["current_project"], "processes", tokens[3], tokens[3] + "_controllers.py"), new_code)
 
                             # model
                             template = env.get_template('add_task_model.tmp')
                             new_code = template.render(taskname=tokens[4])
-                            add_code(os.path.join(ablauf_environment["current_project"], "processes", tokens[3], "App_models.py"), new_code)
+                            add_code(os.path.join(ablauf_environment["current_project"], "processes", tokens[3], tokens[3] + "_models.py"), new_code)
 
                             # apn
-                            json_data = open(os.path.join(ablauf_environment["current_project"], "processes", tokens[3], "App_process.json")).read()
+                            json_data = open(os.path.join(ablauf_environment["current_project"], "processes", tokens[3], tokens[3] + "_process.json")).read()
 
                             data = json.loads(json_data)
                             new_task = {'name': tokens[4], 'type': 'Game', 'exit_transition': {'type': tokens[5], 'destination': tokens[6]}}
                             data["states"].append(new_task)
-                            with open(os.path.join(ablauf_environment["current_project"], "processes", tokens[3], "App_process.json"), 'w') as outfile:
+                            with open(os.path.join(ablauf_environment["current_project"], "processes", tokens[3], tokens[3] + "_process.json"), 'w') as outfile:
                                 json.dump(data, outfile)
                             print("game controller added successful")
                         else:
@@ -413,17 +499,17 @@ def parse_tokens(tokens, data):
                             # controller
                             template = env.get_template('add_usertask.tmp')
                             new_code = template.render(workflow=tokens[3], name=tokens[4], mode=tokens[6], destination=tokens[7])
-                            add_code(os.path.join(ablauf_environment["current_project"], "processes", tokens[3], "App_controllers.py"), new_code)
+                            add_code(os.path.join(ablauf_environment["current_project"], "processes", tokens[3], tokens[3] + "_controllers.py"), new_code)
 
                             # model
                             template = env.get_template('add_usertask_model.tmp')
                             new_code = template.render(taskname=tokens[4])
-                            add_code(os.path.join(ablauf_environment["current_project"], "processes", tokens[3], "App_models.py"), new_code)
+                            add_code(os.path.join(ablauf_environment["current_project"], "processes", tokens[3], tokens[3] + "_models.py"), new_code)
 
                             # view
                             template = env.get_template('add_usertask_view.tmp')
                             new_code = template.render(taskname=tokens[4], containername=tokens[5])
-                            add_code(os.path.join(ablauf_environment["current_project"], "processes", tokens[3], "App_views.py"), new_code)
+                            add_code(os.path.join(ablauf_environment["current_project"], "processes", tokens[3], tokens[3] + "_views.py"), new_code)
 
                             # structure
                             template = env.get_template('dot.tmp')
@@ -431,12 +517,12 @@ def parse_tokens(tokens, data):
                             save_filled_json_template(os.path.join(ablauf_environment["current_project"], "processes", tokens[3], "structure", tokens[4] + ".json"), template, data)
 
                             # apn
-                            json_data = open(os.path.join(ablauf_environment["current_project"], "processes", tokens[3], "App_process.json")).read()
+                            json_data = open(os.path.join(ablauf_environment["current_project"], "processes", tokens[3], tokens[3] + "_process.json")).read()
                             _json_data = json.loads(json_data)
 
-                            new_task = {'name': tokens[4], 'type': 'Task', 'exit_transition': {'type': tokens[6], 'destination': tokens[7]}}
+                            new_task = {'name': tokens[4], 'type': 'UserTask', 'exit_transition': {'type': tokens[6], 'destination': tokens[7]}}
                             _json_data["states"].append(new_task)
-                            with open(os.path.join(ablauf_environment["current_project"], "processes", tokens[3], "App_process.json"), 'w') as outfile:
+                            with open(os.path.join(ablauf_environment["current_project"], "processes", tokens[3], tokens[3] + "_process.json"), 'w') as outfile:
                                 json.dump(_json_data, outfile)
 
                             print("user task:{0} controller added successful".format(tokens[4]))
@@ -465,9 +551,9 @@ def parse_tokens(tokens, data):
                                     # controller
                                     template = env.get_template('add_inclusivegateway.tmp')
                                     new_code = template.render(workflow=tokens[3], name=tokens[4], choices=tokens[5], mode=tokens[6], destination=tokens[7])
-                                    add_code(os.path.join(ablauf_environment["current_project"], "processes", tokens[3], "App_controllers.py"), new_code)
+                                    add_code(os.path.join(ablauf_environment["current_project"], "processes", tokens[3], tokens[3] + "_controllers.py"), new_code)
                                     # apn
-                                    json_data = open(os.path.join(ablauf_environment["current_project"], "processes", tokens[3], "App_process.json")).read()
+                                    json_data = open(os.path.join(ablauf_environment["current_project"], "processes", tokens[3], tokens[3] + "_process.json")).read()
                                     data = json.loads(json_data)
 
                                     _choices = {}
@@ -477,7 +563,7 @@ def parse_tokens(tokens, data):
 
                                     _new_task = {'name': tokens[4], 'type': 'InclusiveGateway', 'choices': _choices, 'default_transition': {'type': tokens[6], 'destination': tokens[7]}}
                                     data["states"].append(_new_task)
-                                    with open(os.path.join(ablauf_environment["current_project"], "processes", tokens[3], "App_process.json"), 'w') as outfile:
+                                    with open(os.path.join(ablauf_environment["current_project"], "processes", tokens[3], tokens[3] + "_process.json"), 'w') as outfile:
                                         json.dump(data, outfile)
 
                                     print("inclusive gateway controller added successful")
@@ -507,9 +593,9 @@ def parse_tokens(tokens, data):
                         # controller
                         template = env.get_template('add_task.tmp')
                         new_code = template.render(name=tokens[3])
-                        delete_code(os.path.join(ablauf_environment["current_project"], "processes", tokens[2], "App_controllers.py"), tokens[3])
+                        delete_code(os.path.join(ablauf_environment["current_project"], "processes", tokens[2], tokens[2] + "_controllers.py"), tokens[3])
                         # apn
-                        json_data = open(os.path.join(ablauf_environment["current_project"], "processes", tokens[2], "App_process.json")).read()
+                        json_data = open(os.path.join(ablauf_environment["current_project"], "processes", tokens[2], tokens[2] + "_process.json")).read()
 
                         data = json.loads(json_data)
                         task_to_delete = -1
@@ -522,7 +608,7 @@ def parse_tokens(tokens, data):
 
                         if found:
                             del data["states"][task_to_delete]
-                            with open(os.path.join(ablauf_environment["current_project"], "processes", tokens[2], "App_process.json"), 'w') as outfile:
+                            with open(os.path.join(ablauf_environment["current_project"], "processes", tokens[2], tokens[2] + "_process.json"), 'w') as outfile:
                                 json.dump(data, outfile)
 
                         print("controller deleted successful")
@@ -637,11 +723,13 @@ def parse_tokens(tokens, data):
                 if ablauf_environment["current_project"] is not None:
                     # create process
                     # -------------------------------------------------------------------------------------------------------------
-                    # syntax: create process [new process name]
+                    # syntax: create process [new process name] [name first state]
                     # -------------------------------------------------------------------------------------------------------------
-                    if tokens.__len__() == 3:
-                        if 0 < tokens[2].__len__() < 32:
-                            create_process(ablauf_environment["current_project"], tokens[2])
+                    if tokens.__len__() == 4:
+                        _process_name = tokens[2]
+                        _first_state = tokens[3]
+                        if 0 < _process_name.__len__() < 32:
+                            create_process(ablauf_environment["current_project"], _process_name, _first_state)
                             print("process successful created")
                     else:
                         print("wrong number of arguments")

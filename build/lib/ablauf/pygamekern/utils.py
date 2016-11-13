@@ -2,6 +2,7 @@ import os
 
 import pygame
 
+import ablauf
 from ablauf import pygamekern
 
 
@@ -90,6 +91,19 @@ def load_sound(name):
     try:
         sound = pygame.mixer.Sound(fullname)
     except Exception as ex:
-        print('Cannot load sound:{0} because:'.format(fullname,ex))
+        print('Cannot load sound:{0} because:'.format(fullname, ex))
         raise SystemExit
     return sound
+
+
+def get_image(path):
+    if not path in ablauf.Automate.image_cache:
+        if os.path.exists(path):
+            _surface = pygame.image.load(path)
+            ablauf.Automate.image_cache[path] = _surface
+            print("loaded {0} into the cache".format(path))
+        else:
+            #print("[Warning] File not found:" + path)
+            return None
+
+    return ablauf.Automate.image_cache[path]
