@@ -2,7 +2,6 @@ __author__ = 'thorsten'
 
 import ablauf
 
-
 # Abstract Models
 # =============================================================================
 class DefaultModel(ablauf.Model):

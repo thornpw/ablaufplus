@@ -93,10 +93,11 @@ class ExclusiveGateway(ablauf.APNState):
             ablauf.logger.debug("State: {0} has no leave function".format(self.name))
 
         if isinstance(self.yes_transition, Transit):
+            _transition_function = None
             try:
                 exec ("_transition_function = self.transition_to_" + self.yes_transition.destination + "_" + self.yes_transition.type)
-            except:
-                _transition_function = None
+            except Exception as ex:
+               pass
 
             self.add_transition(ablauf.Transition("yes_transition", self.yes_transition.destination, _transition_function))
 
@@ -307,10 +308,11 @@ class MultiInstance(ablauf.APNState):
             self.add_transition(ablauf.Transition("loop_transition", self.loop_transition.destination, _transition_function))
 
         if isinstance(self.exit_transition, Transit):
+            _transition_function = None
             try:
                 exec ("_transition_function = self.transition_to_" + self.exit_transition.destination + "_" + self.exit_transition.type)
-            except:
-                _transition_function = None
+            except Exception as ex:
+                pass
 
             self.add_transition(ablauf.Transition("exit_transition", self.exit_transition.destination, _transition_function))
 

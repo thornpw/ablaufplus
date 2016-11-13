@@ -7,10 +7,11 @@ import os
 import logging.config  # the logging configuration
 import importlib
 import json
+import sys
 
 # ablauf
 # ----------------------------------------------------------------------------------------------------------------------
-import dot
+import ablauf.dot
 
 # sql alchemy
 # ----------------------------------------------------------------------------------------------------------------------
@@ -116,6 +117,7 @@ class Automate(object):
     _actual_state_name_in_creation = None
     _kernel = None
     _input_handler = None
+    _image_cache = {}
 
     class __metaclass__(type):
         @property
@@ -221,6 +223,14 @@ class Automate(object):
         @actual_state_name_in_creation.setter
         def actual_state_name_in_creation(cls, value):
             cls._actual_state_name_in_creation = value
+
+        @property
+        def image_cache(cls):
+            return cls._image_cache
+
+        @image_cache.setter
+        def image_cache(cls, value):
+            cls._image_cache = value
 
     __active = False
 
@@ -395,6 +405,16 @@ class Automate(object):
             cls.kernel.screen_flip()
 
 
+class Controller(object):
+    @classmethod
+    def jump(cls, segment,action):
+        if str(action) in segment.input_mappings["padinputmappings"]:
+            Automate.jump(segment.input_mappings["padinputmappings"][str(action)]["Model"]["destination"])
+        elif str(action) in segment.input_mappings["keyinputmappings"]:
+            print(segment.input_mappings["keyinputmappings"][str(action)]["Model"]["destination"])
+            Automate.jump(segment.input_mappings["keyinputmappings"][str(action)]["Model"]["destination"])
+
+
 class Process(object):
     def __init__(self, name):
         self.name = name
@@ -490,13 +510,13 @@ class APNState(State):
             _process = Automate.actual_process_name_in_creation
             exec ("self.model = Automate.custom_models[Automate.actual_process_name_in_creation]." + name + "Model(\"" + _process + "\",\"" + name + "\")")
         except Exception as ex:
-            logger.debug("no model found in state: {0}: {1} ".format(name, str(ex.message)))
+            logger.debug("no model found in state: {0}: {1} ".format(name, str(ex)))
 
         # set view
         try:
             exec ("self.view = Automate.custom_views[Automate.actual_process_name_in_creation]." + name + "View(\"" + name + "\",self.model)")
         except Exception as ex:
-            logger.debug("no view found in state: {0}: {1} ".format(name, str(ex.message)))
+            logger.debug("no view found in state: {0}: {1} ".format(name, str(ex)))
 
         # call parent
         State.__init__(self, name, Automate.actual_process_name_in_creation, self.view, self.model)
@@ -519,7 +539,7 @@ class APNState(State):
 
         if not _model is None:
             # test if an action was triggered by a pad event
-            _action = Automate._input_handler.get_action(event)
+            _action = Automate.input_handler.get_action(event)
             if _action is not None:
                 self.is_event_defined_in_segment(_action, _model.actual_segment, "padinputmappings")
 
@@ -538,9 +558,16 @@ class APNState(State):
         try:
             if str(action) in segment.input_mappings[mapping]:
                 try:
+                    print(segment.input_mappings[mapping][str(action)]["Controller"])
                     exec ("segment." + segment.input_mappings[mapping][str(action)]["Controller"] + "(segment)")
                 except Exception as ex:
-                     exec ("Automate.custom_controllers['Global']." + segment.input_mappings[mapping][str(action)]["Controller"] + "(segment)")
+                    try:
+                        exec ("Automate.custom_controllers['Global']." + segment.input_mappings[mapping][str(action)]["Controller"] + "(segment)")
+                    except Exception as ex:
+                        try:
+                            exec (segment.input_mappings[mapping][str(action)]["Controller"] + "(segment,action)")
+                        except Exception as ex:
+                            pass
             elif segment.parent.parent is not None:
                     self.is_event_defined_in_segment(action, segment.parent.parent.segments[segment.parent.parent.actual_segment], mapping)
         except Exception as ex:
@@ -632,7 +659,7 @@ class Model(object):
             self.actual_segment = self.segment_by_name[self.actual_path]
             self.actual_grid = self.actual_segment.parent
         else:
-            self.actual_segment = dot.Segment({"name":"dummy","input_mappings":[],"polling":[]},None)
+            self.actual_segment = ablauf.dot.Segment({"name":"dummy","input_mappings":[],"polling":[]},None)
 
 
     def create_grid(self, att, parent):
@@ -640,7 +667,7 @@ class Model(object):
         Create a grid structure used to bind input controls to it.
         """
         # create the grid object
-        _grid = dot.Grid(att, parent)
+        _grid = ablauf.dot.Grid(att, parent)
 
         # put the name of the grid into a dictionary
         self.grid_by_name[_grid.name] = _grid
@@ -687,9 +714,12 @@ class Model(object):
             _segment_x = _grid.x
 
             for _segment_column in range(0, att["columns"]):
+                print("sc:"+str(_segment_column) + str(att["columns"]))
                 _segment_name = _grid.name + "_" + str(_segment_column) + "_" + str(_segment_row)
 
-                exec ("_segment = dot." + _class_name + "(att, _grid,_segment_x,_segment_y,_segment_column,_segment_row)")
+                _class = getattr(ablauf, "dot") #ToDo: split vom classname
+                _subclass = getattr(_class,_class_name)
+                _segment = _subclass(att,_grid,_segment_x,_segment_y,_segment_column,_segment_row)
 
                 self.segment_by_name[_segment.key] = _segment
                 _grid.segments.append(_segment)
@@ -727,7 +757,7 @@ def init():
     Automate.input_handler = importlib.import_module(Data.configuration["input_handler"])
 
     # set global input mapping
-    dot.Segment.set_input_mappings(Data.configuration, Data.configuration["inputmappings"])
+    ablauf.dot.Segment.set_input_mappings(Data.configuration, Data.configuration["inputmappings"])
 
     # load translations
     with open(os.getcwd() + '/configuration/translations.json') as data_file:
@@ -772,61 +802,61 @@ def init():
     d = os.path.join(os.getcwd(), "processes")
 
     for _process_name in os.listdir(d):
-        if os.path.isdir(os.path.join(os.getcwd(), "processes", _process_name)):
-            Automate.actual_process_name_in_creation = _process_name
+        if not _process_name.startswith("__"):
+            if os.path.isdir(os.path.join(os.getcwd(), "processes", _process_name)):
+                Automate.actual_process_name_in_creation = _process_name
 
-            if os.path.isdir(os.path.join(d, _process_name)):
-                # Create processes
-                # *****************************************************************************
-                with open(os.path.join(d, _process_name, _process_name + "_process.json")) as data_file:
-                    apn_json = json.load(data_file)
+                if os.path.isdir(os.path.join(d, _process_name)):
+                    # Create processes
+                    # *****************************************************************************
+                    with open(os.path.join(d, _process_name, _process_name + "_process.json")) as data_file:
+                        apn_json = json.load(data_file)
 
-                Automate.processes[_process_name] = Process(_process_name)
+                    Automate.processes[_process_name] = Process(_process_name)
 
-                _Start = State("start", _process_name)
-                _GoFirst = Transition("GotoFirstState", apn_json["states"][0]["name"], None)
+                    _Start = State("start", _process_name)
+                    _GoFirst = Transition("GotoFirstState", apn_json["states"][0]["name"], None)
 
-                _Start.add_transition(_GoFirst)
+                    _Start.add_transition(_GoFirst)
 
-                _End = State("end", _process_name)
-                _End.enter_function = Automate.finish_subprocess
+                    _End = State("end", _process_name)
+                    _End.enter_function = Automate.finish_subprocess
 
-                # Loads the parts of a process
-                # ************************************************************************************
-                try:
-                    Automate.custom_views[_process_name] = importlib.import_module("processes." + _process_name + "." + _process_name + "_views")
-                    logger.debug("[ok] {0}_views loaded".format(_process_name))
-                except ImportError as ex:
-                    logger.error("[ERROR!] Did not found {0}_views".format(_process_name))
+                    # Loads the parts of a process
+                    # ************************************************************************************
+                    try:
+                        Automate.custom_views[_process_name] = importlib.import_module("processes." + _process_name + "." + _process_name + "_views")
+                        logger.debug("[ok] {0}_views loaded".format(_process_name))
+                    except ImportError as ex:
+                        logger.error("[ERROR!] Did not found {0}_views".format(_process_name))
 
-                try:
-                    Automate.custom_controllers[_process_name] = importlib.import_module("processes." + _process_name + "." + _process_name + "_controllers")
-                    logger.debug("[ok] {0}_controllers loaded".format(_process_name))
-                except ImportError as ex:
-                    logger.error("[ERROR!] Did not found {0}_controllers".format(_process_name))
+                    try:
+                        Automate.custom_controllers[_process_name] = importlib.import_module("processes." + _process_name + "." + _process_name + "_controllers")
+                        logger.debug("[ok] {0}_controllers loaded".format(_process_name))
+                    except ImportError as ex:
+                        logger.error("[ERROR!] Did not found {0}_controllers".format(_process_name))
 
-                try:
-                    Automate.custom_models[_process_name] = importlib.import_module("processes." + _process_name + "." + _process_name + "_models")
-                    logger.debug("[ok] {0}_models loaded".format(_process_name))
-                except ImportError as ex:
-                    logger.error("[ERROR!] Did not found {0}_models".format(_process_name))
+                    try:
+                        Automate.custom_models[_process_name] = importlib.import_module("processes." + _process_name + "." + _process_name + "_models")
+                        logger.debug("[ok] {0}_models loaded".format(_process_name))
+                    except ImportError as ex:
+                        logger.error("[ERROR!] Did not found {0}_models".format(_process_name))
 
-                # Import states from the states.json file
-                # *************************************************************************************
-                for state in apn_json["states"]:
-                    logger.debug("----------------------------------------------- State:{0} ----------------------------------------------------------".format(state["name"]))
-                    Automate.actual_state_name_in_creation = state["name"]
+                    # Import states from the states.json file
+                    # *************************************************************************************
+                    for state in apn_json["states"]:
+                        logger.debug("----------------------------------------------- State:{0} ----------------------------------------------------------".format(state["name"]))
+                        Automate.actual_state_name_in_creation = state["name"]
 
-                    exec ("Automate.custom_controllers[_process_name]." + state["name"] + "(state)")
+                        exec ("Automate.custom_controllers[_process_name]." + state["name"] + "(state)")
 
     # initialize kernel
     # ==============================================================================================================
     Automate.kernel.init()
 
-
-    # initialize input handler
+    # initialize input handler : Todo: depreceated
     # ==============================================================================================================
-    Automate.input_handler.init()
+    # Automate.input_handler.init()
 
 
 def start(root_process_name="App", init_function=None):

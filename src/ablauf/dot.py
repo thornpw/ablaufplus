@@ -80,7 +80,7 @@ class Segment(object):
         # matrix
         self.row = row
         self.column = column
-        self.segment_number = column + (columns * row)
+        self.segment_number = column + (parent.columns * row)
 
         # coordinates
         self.x = x
@@ -103,6 +103,9 @@ class Segment(object):
         self.polling = None
         if "polling" in data:
             self.polling = data['polling']
+
+        # selected
+        self.selected = False
 
     def change_actual_path(self, new_path, model):
         model.actual_path = new_path
@@ -138,31 +141,6 @@ class Segment(object):
 
 # Form controller
 # ---------------------------------------------------------------------------------------------------------
-class ButtonHorizontal(Segment):
-    def __init__(self, data, parent, x=0, y=0, column=0, row=0):
-        Segment.__init__(self, data, parent, x, y, column, row)
-
-    def segment_left(self, segment):
-        _model = ablauf.Automate.model
-        if segment.column > 0:
-            segment.parent.change_actual_segment(-1)
-            self.change_actual_path(self.get_path_from_grid_key(_model.actual_segment.parent.key, _model), _model)
-        else:
-            if segment.parent.navigation is not None:
-                if "left" in segment.parent.navigation:
-                    self.change_actual_path(self.get_path_from_grid_key(segment.parent.navigation["left"], _model), _model)
-
-    def segment_right(self, segment):
-        _model = ablauf.Automate.model
-        if segment.column < segment.parent.columns - 1:
-            segment.parent.change_actual_segment(1)
-            self.change_actual_path(self.get_path_from_grid_key(_model.actual_segment.parent.key, _model), _model)
-        else:
-            if segment.parent.navigation is not None:
-                if "right" in segment.parent.navigation:
-                    self.change_actual_path(self.get_path_from_grid_key(segment.parent.navigation["right"], _model), _model)
-
-
 class SelectionVertical(Segment):
     def __init__(self, data, parent, x=0, y=0, column=0, row=0):
         Segment.__init__(self, data, parent, x, y, column, row)
@@ -189,7 +167,7 @@ class SelectionVertical(Segment):
 
     def segment_down(self, segment):
         _model = ablauf.Automate.model
-        if segment.segment_number < segment.parent.max_segments - segment.parent.columns:
+        if segment.segment_number < segment.parent.visible_rows - 1:
             if segment.segment_number + segment.parent.columns <= (ablauf.Data.session[segment.parent.data].__len__() - 1):
                 segment.parent.change_actual_segment(segment.parent.columns)
                 self.change_actual_path(self.get_path_from_grid_key(_model.actual_segment.parent.key, _model), _model)
@@ -200,49 +178,10 @@ class SelectionVertical(Segment):
                 self.change_actual_path(self.get_path_from_grid_key(segment.parent.navigation["down"], _model), _model)
 
     def toggle(self, segment):
-        _obj = ablauf.Data.session[segment.parent.data][segment.segment_number + segment.parent.visible_rows_offset * segment.parent.columns + segment.parent.visible_columns_offset]
-
-        if _obj.selected:
-            _obj.selected = False
+        if segment.selected:
+            segment.selected = False
         else:
-            _obj.selected = True
-
-
-class DPad(Segment):
-    def __init__(self, data, parent, x=0, y=0, column=0, row=0):
-        Segment.__init__(self, data, parent, x, y, column, row)
-
-    def segment_left(self, segment):
-        _model = ablauf.Automate.model
-        if segment.segment_number > 0:
-            segment.parent.change_actual_segment(-1)
-            self.change_actual_path(self.get_path_from_grid_key(_model.actual_segment.parent.key, _model), _model)
-
-    def segment_right(self, segment):
-        _model = ablauf.Automate.model
-        if segment.segment_number < (ablauf.Data.session[segment.parent.data].__len__() - 1): #todo: kein data
-            if segment.segment_number < segment.parent.max_segments - 1:
-                segment.parent.change_actual_segment(1)
-                self.change_actual_path(self.get_path_from_grid_key(_model.actual_segment.parent.key, _model), _model)
-
-    def segment_up(self, segment):
-        _model = ablauf.Automate.model
-        if segment.segment_number >= segment.parent.columns:
-            segment.parent.change_actual_segment(-segment.parent.columns)
-            self.change_actual_path(self.get_path_from_grid_key(_model.actual_segment.parent.key, _model), _model)
-        else:
-            if "up" in segment.parent.navigation:
-                self.change_actual_path(self.get_path_from_grid_key(segment.parent.navigation["up"], _model), _model)
-
-    def segment_down(self, segment):
-        _model = ablauf.Automate.model
-        if segment.segment_number < segment.parent.max_segments - segment.parent.columns:
-            if segment.segment_number + segment.parent.columns <= (ablauf.Data.session[segment.parent.data].__len__() - 1):
-                segment.parent.change_actual_segment(segment.parent.columns)
-                self.change_actual_path(self.get_path_from_grid_key(_model.actual_segment.parent.key, _model), _model)
-        else:
-            if "down" in segment.parent.navigation:
-                self.change_actual_path(self.get_path_from_grid_key(segment.parent.navigation["down"], _model), _model)
+            segment.selected = True
 
 
 class Jump(Segment):
@@ -260,11 +199,12 @@ class Jump(Segment):
 
     def segment_right(self, segment):
         _model = ablauf.Automate.model
-        if not segment.parent.data is None:
-            if segment.segment_number < (ablauf.Data.session[segment.parent.data].__len__() - 1): #todo: kein data
-                if segment.segment_number < segment.parent.max_segments - 1:
-                    segment.parent.change_actual_segment(1)
-                    self.change_actual_path(self.get_path_from_grid_key(_model.actual_segment.parent.key, _model), _model)
+
+        if segment.parent.data is not None and (segment.segment_number) >= (ablauf.Data.session[segment.parent.data].__len__() - 1):
+            return
+        if segment.segment_number < segment.parent.max_segments - 1:
+            segment.parent.change_actual_segment(1)
+            self.change_actual_path(self.get_path_from_grid_key(_model.actual_segment.parent.key, _model), _model)
         else:
             if "right" in segment.parent.navigation:
                 self.change_actual_path(self.get_path_from_grid_key(segment.parent.navigation["right"], _model), _model)
@@ -281,70 +221,23 @@ class Jump(Segment):
     def segment_down(self, segment):
         _model = ablauf.Automate.model
         if segment.segment_number < segment.parent.max_segments - segment.parent.columns:
-            if segment.segment_number + segment.parent.columns <= (ablauf.Data.session[segment.parent.data].__len__() - 1):
-                segment.parent.change_actual_segment(segment.parent.columns)
-                self.change_actual_path(self.get_path_from_grid_key(_model.actual_segment.parent.key, _model), _model)
+            if segment.parent.data is not None and segment.segment_number + segment.parent.columns > (ablauf.Data.session[segment.parent.data].__len__() - 1):
+                return
+            segment.parent.change_actual_segment(segment.parent.columns)
+            self.change_actual_path(self.get_path_from_grid_key(_model.actual_segment.parent.key, _model), _model)
         else:
             if "down" in segment.parent.navigation:
                 self.change_actual_path(self.get_path_from_grid_key(segment.parent.navigation["down"], _model), _model)
 
     def button_down(self, segment):
-        _model = ablauf.Automate.model
-        _segment_model = segment.model
-        ablauf.Automate.jump(segment.model["destinations"][segment.segment_number])
-
         # handle mapping
         if "mapping" in segment.model:
             for mappings in segment.model["mapping"]:
-                exec("ablauf.Data.session{0} = {1}".format(mappings[0], mappings[1]))
+                exec ("ablauf.Data.session{0} = {1}".format(mappings[0], mappings[1]))
 
-
-class AddChar(Segment):
-    def __init__(self, data, parent, x=0, y=0, column=0, row=0):
-        Segment.__init__(self, data, parent, x, y, column, row)
-
-    def segment_left(self, segment):
         _model = ablauf.Automate.model
-        if segment.segment_number > 0:
-            segment.parent.change_actual_segment(-1)
-            self.change_actual_path(self.get_path_from_grid_key(_model.actual_segment.parent.key, _model), _model)
-        else:
-            if "left" in segment.parent.navigation:
-                self.change_actual_path(self.get_path_from_grid_key(segment.parent.navigation["left"], _model), _model)
-
-    def segment_right(self, segment):
-        _model = ablauf.Automate.model
-        if not segment.parent.data is None:
-            if segment.segment_number < (ablauf.Data.session[segment.parent.data].__len__() - 1): #todo: kein data
-                if segment.segment_number < segment.parent.max_segments - 1:
-                    segment.parent.change_actual_segment(1)
-                    self.change_actual_path(self.get_path_from_grid_key(_model.actual_segment.parent.key, _model), _model)
-        else:
-            if "right" in segment.parent.navigation:
-                self.change_actual_path(self.get_path_from_grid_key(segment.parent.navigation["right"], _model), _model)
-
-    def segment_up(self, segment):
-        _model = ablauf.Automate.model
-        if segment.segment_number >= segment.parent.columns:
-            segment.parent.change_actual_segment(-segment.parent.columns)
-            self.change_actual_path(self.get_path_from_grid_key(_model.actual_segment.parent.key, _model), _model)
-        else:
-            if "up" in segment.parent.navigation:
-                self.change_actual_path(self.get_path_from_grid_key(segment.parent.navigation["up"], _model), _model)
-
-    def segment_down(self, segment):
-        _model = ablauf.Automate.model
-        if segment.segment_number < segment.parent.max_segments - segment.parent.columns:
-            if segment.segment_number + segment.parent.columns <= (ablauf.Data.session[segment.parent.data].__len__() - 1):
-                segment.parent.change_actual_segment(segment.parent.columns)
-                self.change_actual_path(self.get_path_from_grid_key(_model.actual_segment.parent.key, _model), _model)
-        else:
-            if "down" in segment.parent.navigation:
-                self.change_actual_path(self.get_path_from_grid_key(segment.parent.navigation["down"], _model), _model)
-
-    def button_down(self, segment):
-        _model = ablauf.Automate.model
-        ablauf.Data.session[segment.model["bind"]] += segment.model["char"]
+        _segment_model = segment.model
+        ablauf.Automate.jump(segment.model["destinations"][0])
 
 
 class FourWaySegment(Segment):
@@ -362,11 +255,12 @@ class FourWaySegment(Segment):
 
     def segment_right(self, segment):
         _model = ablauf.Automate.model
-        if not segment.parent.data is None:
-            if segment.segment_number < (ablauf.Data.session[segment.parent.data].__len__() - 1): #todo: kein data
-                if segment.segment_number < segment.parent.max_segments - 1:
-                    segment.parent.change_actual_segment(1)
-                    self.change_actual_path(self.get_path_from_grid_key(_model.actual_segment.parent.key, _model), _model)
+
+        if segment.parent.data is not None and (segment.segment_number) >= (ablauf.Data.session[segment.parent.data].__len__() - 1):
+            return
+        if segment.segment_number < segment.parent.max_segments - 1:
+            segment.parent.change_actual_segment(1)
+            self.change_actual_path(self.get_path_from_grid_key(_model.actual_segment.parent.key, _model), _model)
         else:
             if "right" in segment.parent.navigation:
                 self.change_actual_path(self.get_path_from_grid_key(segment.parent.navigation["right"], _model), _model)
@@ -382,13 +276,24 @@ class FourWaySegment(Segment):
 
     def segment_down(self, segment):
         _model = ablauf.Automate.model
-        if segment.segment_number < segment.parent.max_segments - segment.parent.columns:
+        if segment.segment_number < segment.parent.visible_rows - 1:
             if segment.segment_number + segment.parent.columns <= (ablauf.Data.session[segment.parent.data].__len__() - 1):
                 segment.parent.change_actual_segment(segment.parent.columns)
                 self.change_actual_path(self.get_path_from_grid_key(_model.actual_segment.parent.key, _model), _model)
+        elif segment.parent.visible_rows_offset < segment.parent.rows - segment.parent.visible_rows:
+            segment.parent.visible_rows_offset += 1
         else:
             if "down" in segment.parent.navigation:
                 self.change_actual_path(self.get_path_from_grid_key(segment.parent.navigation["down"], _model), _model)
+
+
+class AddChar(FourWaySegment):
+    def __init__(self, data, parent, x=0, y=0, column=0, row=0):
+        Segment.__init__(self, data, parent, x, y, column, row)
+
+    def button_down(self, segment):
+        _model = ablauf.Automate.model
+        ablauf.Data.session[segment.model["bind"]] += segment.model["char"]
 
 
 class DelChar(FourWaySegment):
