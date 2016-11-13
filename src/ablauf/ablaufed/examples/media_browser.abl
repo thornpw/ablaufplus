@@ -1,0 +1,68 @@
+# single player game
+# ==================
+
+# create project
+# ******************************************************
+create project /home/thorsten/Dropbox/Entwickeln/Python_3/ablaufplus/src/ablauf/ablaufed/examples mbtest9 pygamekern steuer Stema
+connect project /home/thorsten/Dropbox/Entwickeln/Python_3/ablaufplus/src/ablauf/ablaufed/examples/mbtest9
+
+# Model
+# ******************************************************
+add json configuration ["width"] 1 '1060'
+add json configuration ["height"] 1 '860'
+
+
+# Processes
+# ******************************************************
+# Info
+# ------------------------------------------------------
+create process Info info_form
+
+# Filter
+# ------------------------------------------------------
+create process Filter filter_form
+
+# Controllers
+# ******************************************************
+# App
+# ------------------------------------------------------
+add controller subprocess App Stema Jump library '{}'
+add controller usertask App library library_dialog Jump end '{"start_path": "library_dialog/media/media_0_0"}'
+add controller subprocess App Info Jump library '{}'
+
+add controller subprocess App Filter Jump library '{}'
+# Info
+# ------------------------------------------------------
+add controller usertask Info info_form info_dialog Jump library '{"start_path": "info_dialog/info_button_panel/info_cancel/info_cancel_0_0"}'
+
+# Filter
+# ------------------------------------------------------
+add controller usertask Filter filter_form filter_dialog Jump library '{"start_path": "filter_dialog/filter_button_panel/filter_cancel/filter_cancel_0_0"}'
+
+# Views
+# ******************************************************
+# library
+# ------------------------------------------------------
+add container jump App library header 1 0 None '{"x":850,"y":10,"y_offset":110,"x_offset":110,"columns":2,"visible_columns":2,"navigation":{"down":"library_dialog/media"},"model":{}}'
+add container jump App library media 2 0 None '{"x":30,"y":130,"y_offset":100,"x_offset":100,"rows":3,"visible_rows":3,"columns":3,"visible_columns":3, "navigation":{"up":"library_dialog/header"},"model":{"destinations":["Info"]}}'
+
+# info
+# ------------------------------------------------------
+add container jump Info info_form content 1 0 None '{"x":30,"y":30,"model":{"destinations":["library"]}}'
+add container jump Info info_form info_button_panel 2 0 None '{"x":100,"y":530,"rows":1,"visible_rows":1,"columns":1,"visible_columns":1,"x_offset":110,"actual_segment": 1, "model":{}}'
+add container jump Info info_form info_ok 3 0 ["children"][1][0]["children"] '{"x":10,"y":20, "navigation":{"right":"info_dialog/info_button_panel/info_cancel"}, "model":{"destinations":["end"]}}'
+add container jump Info info_form info_cancel 4 0 ["children"][1][0]["children"] '{"x":110,"y":20, "navigation":{"left":"info_dialog/info_button_panel/info_ok"}, "model":{"destinations":["end"]}}'
+
+
+# filter
+# ------------------------------------------------------
+# add container jump Filter filter_form filters 1 0 None '{"x":30,"y":30,"model":{"destinations":["library"]}}'
+add container jump Filter filter_form filter_name 1 0 None '{"x":10,"y":10,"rows":1,"visible_rows":1,"columns":1,"visible_columns":1,"x_offset":110,"actual_segment": 0, "model":{}}'
+add container SelectVertical Filter filter_form filter_name_list 2 0 ["children"][0][0]["children"] '{"x":10,"y":10,"rows":26,"visible_rows":10,"columns":1,"visible_columns":1,"x_offset":110,"actual_segment": 0, "model":{}}'
+add container ButtonHorizontal Filter filter_form filter_button_panel 3 0 None '{"x":100,"y":530,"rows":1,"visible_rows":1,"columns":1,"visible_columns":1,"x_offset":110,"actual_segment": 1, "model":{}}'
+add container jump Filter filter_form filter_ok 4 0 ["children"][1][0]["children"] '{"x":10,"y":20, "navigation":{"right":"filter_dialog/filter_button_panel/filter_cancel"}, "model":{"destinations":["end"]}}'
+add container jump Filter filter_form filter_cancel 5 0 ["children"][1][0]["children"] '{"x":110,"y":20, "navigation":{"left":"filter_dialog/filter_button_panel/filter_ok"}, "model":{"destinations":["end"]}}'
+
+# Input handling
+# ******************************************************
+add json_element processes/App/structure/library.json None input_mappings 1 '[{"Pad":"BUTTON_SELECT","Key":"K_w","Controller":"Controller.jump","Model":{"destination":"Filter"}}] '

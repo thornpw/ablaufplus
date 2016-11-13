@@ -1,0 +1,23 @@
+    # <ab> start container id: {{containername}}
+    def render_{{containername}}(self, segment):
+        if segment.key == self.model.actual_path:
+            _color = self.model.color_selected
+        else:
+            _color = self.model.color_text
+
+        if "text" in segment.model:
+            _session_data = ""
+            if "data" in segment.model:
+                for _element in segment.model["data"]:
+                    _session_data += "ablauf.Data.session" + _element +","
+                _session_data = _session_data[:-1]
+
+            exec("_text = '{0}'.format({1})".format(segment.model["text"],_session_data))
+        else:
+            _text = segment.name
+
+        ablauf.pygamekern.utils.scalable_text(_text, segment.x, segment.y , None, 20, _color)
+
+    # <ab> end container id: {{containername}}
+
+

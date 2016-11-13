@@ -1,0 +1,29 @@
+{
+  "steuer_initializing":"Steuer initializing",
+  "controller_detection":"Controller detection",
+  "string_unknown_explanation": [
+    "There are connected controllers that could not be detected",
+    "These controllers will now be configured in a guided dialog"
+  ],
+  "unknown_header": "Unknown controller mapping",
+  "mapping_explanation": [
+    "First the status of the actual action will be \"Detect event\"",
+    "Trigger an event on the controller that correspond to the action",
+    "After you triggered the event, release the event",
+    "The status of the action now changes to \"Wait\"",
+    "After the delay go on with the next action"
+  ],
+  "controller_status": "Controller status",
+  "actual_controller": "Actual controller",
+  "actual_action": "Actual action",
+  "action_status": "Action status",
+
+  "mapping_database_found_and_loaded": "Mapping database found and loaded",
+  "no_mapping_database_found_a_new_one_will_be_created": "No mapping database found. A new one will be created",
+  "configuration": "Configuration",
+  "start_mapping": "Start mapping : {0}",
+  "trigger_the_event_then_release_it": "Trigger the event then release it",
+  "action_mapped": "Action: {0} mapped",
+  "event_was_already_mapped": "Event was already mapped",
+  "wait": "Wait"
+}

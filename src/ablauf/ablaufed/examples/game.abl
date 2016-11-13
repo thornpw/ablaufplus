@@ -1,0 +1,127 @@
+# single player game
+# ==================
+
+# create project
+# ******************************************************
+create project /home/thorsten/Dropbox/Entwickeln/Python test2 pygamekern steuer Stema
+connect project /home/thorsten/Dropbox/Entwickeln/Python/test2
+
+# Model
+# ******************************************************
+add json session ["actual_round"] 1 '0'
+add json session ["change_playername"] 1 '0'
+add json session ["new_playername"] 1 '""'
+add json session ["player_scores"] 1 '[1,2,3,4,5,6,7,8]'
+add json session ["player_names"] 1 '["player1","player2","player3","player4","player5","player6","player7","player8"]'
+add json session ["place_points"] 1 '[80,60,50,40,30,20,10,0]'
+add json session ["parameters"] 1 '{}'
+add json session ["parameters"]["number_of_rounds"] 1 '1'
+add json session ["parameters"]["number_of_lives"] 1 '0'
+add json session ["parameters"]["number_of_players"] 1 '8'
+add json session ["highscores"] 1 '[]'
+add json session ["highscores"] 10 '{"place": "#ABL_COUNTER1#", "ID": "unknown","score": 0}'
+add json session ["tournament"] 1 '[]'
+add json session ["tournament"] 8 '{"updown":"", "last_place": -1, "place": 0, "ID": "unknown","1":0, "2":0, "3":0, "4":0, "5":0, "6":0, "7":0, "8":0, "score_place":0, "score": 0, "points":0 }'
+
+# Controllers
+# ******************************************************
+add controller subprocess App Stema Jump menu '{}'
+add controller usertask App menu menu_dialog Jump end '{"start_path": "menu_dialog/start/start_0_0"}'
+add controller usertask App options options_dialog Jump menu '{"start_path": "options_dialog/lives/lives_0_0"}'
+add controller usertask App credits credits_dialog Jump menu '{"start_path": "credits_dialog/exit/exit_0_0"}'
+add controller usertask App players players_dialog Jump menu '{"start_path": "players_dialog/player1/player1_0_0"}'
+add controller usertask App playername playername_dialog Jump menu '{"start_path": "playername_dialog/exit/exit_0_0"}'
+add controller usertask App highscore highscore_dialog Jump menu '{"start_path": "highscore_dialog/exit/exit_0_0"}'
+add controller task App game_init Jump game '{}'
+add controller game App game Transit highscore '{}'
+
+# Views
+# ******************************************************
+# menu
+# ------------------------------------------------------
+add container jump App menu start 1 0 '{"x":30,"y":30,"navigation":{"down":"menu_dialog/options"},"model":{"destinations":["game_init"]}}'
+add container jump App menu options 2 0 '{"x":30,"y":50,"navigation":{"up":"menu_dialog/start","down":"menu_dialog/credits"},"model":{"destinations":["options"]}}'
+add container jump App menu credits 3 0 '{"x":30,"y":70,"navigation":{"up":"menu_dialog/options","down":"menu_dialog/players"},"model":{"destinations":["credits"]}}'
+add container jump App menu players 4 0 '{"x":30,"y":90,"navigation":{"up":"menu_dialog/credits","down":"menu_dialog/highscore"},"model":{"destinations":["players"]}}'
+add container jump App menu highscore 5 0 '{"x":30,"y":110,"navigation":{"up":"menu_dialog/players","down":"menu_dialog/quit"},"model":{"destinations":["highscore"]}}'
+add container jump App menu quit 6 0 '{"x":30,"y":130,"navigation":{"up":"menu_dialog/highscore"},"model":{"destinations":["end"]}}'
+
+# options
+# ------------------------------------------------------
+add container numberoption App options lives 1 0 '{"x":30,"y":30,"navigation":{"down":"options_dialog/exit"},"model":{"parameter":"number_of_lives","parameter_x":100,"parameter_y":0,"max": 1,"step": 1}}'
+add container jump App options exit 2 0 '{"x":30,"y":50,"navigation":{"up":"options_dialog/lives"},"model":{"destinations":["menu"]}}'
+
+# credits
+# ------------------------------------------------------
+add container jump App credits exit 1 0 '{"x":30,"y":530,"model":{"destinations":["menu"]}}'
+
+# players
+# ------------------------------------------------------
+add container jump App players player1 1 0 '{"x":30,"y":30,"navigation":{"down":"players_dialog/player2"},"model":{"text":"player1: {0}","data":["['player_names'][0]"],"destinations":["playername"],"mapping":[["['change_playername']",0],["['new_playername']","\"\""]]}}'
+add container jump App players player2 2 0 '{"x":30,"y":50,"navigation":{"down":"players_dialog/player3","up":"players_dialog/player1"},"model":{"text":"player2: {0}","data":["['player_names'][1]"],"destinations":["playername"],"mapping":[["['change_playername']",1],["['new_playername']","\"\""]]}}'
+add container jump App players player3 3 0 '{"x":30,"y":70,"navigation":{"down":"players_dialog/player4","up":"players_dialog/player2"},"model":{"text":"player3: {0}","data":["['player_names'][2]"],"destinations":["playername"],"mapping":[["['change_playername']",2],["['new_playername']","\"\""]]}}'
+add container jump App players player4 4 0 '{"x":30,"y":90,"navigation":{"down":"players_dialog/player5","up":"players_dialog/player3"},"model":{"text":"player4: {0}","data":["['player_names'][3]"],"destinations":["playername"],"mapping":[["['change_playername']",3],["['new_playername']","\"\""]]}}'
+add container jump App players player5 5 0 '{"x":30,"y":110,"navigation":{"down":"players_dialog/player6","up":"players_dialog/player4"},"model":{"text":"player5: {0}","data":["['player_names'][4]"],"destinations":["playername"],"mapping":[["['change_playername']",4],["['new_playername']","\"\""]]}}'
+add container jump App players player6 6 0 '{"x":30,"y":130,"navigation":{"down":"players_dialog/player7","up":"players_dialog/player5"},"model":{"text":"player6: {0}","data":["['player_names'][5]"],"destinations":["playername"],"mapping":[["['change_playername']",5],["['new_playername']","\"\""]]}}'
+add container jump App players player7 7 0 '{"x":30,"y":150,"navigation":{"down":"players_dialog/player8","up":"players_dialog/player6"},"model":{"text":"player7: {0}","data":["['player_names'][6]"],"destinations":["playername"],"mapping":[["['change_playername']",6],["['new_playername']","\"\""]]}}'
+add container jump App players player8 8 0 '{"x":30,"y":170,"navigation":{"down":"players_dialog/exit","up":"players_dialog/player7"},"model":{"text":"player8: {0}","data":["['player_names'][7]"],"destinations":["playername"],"mapping":[["['change_playername']",7],["['new_playername']","\"\""]]}}'
+add container jump App players exit 9 0 '{"x":30,"y":530, "navigation":{"up":"players_dialog/player8"},"model":{"destinations":["menu"]}}'
+
+# playername
+# ------------------------------------------------------
+add container text App playername playernumber 1 0 '{"x":30,"y":30,"model":{"text":"edit playername for player: {0}","data":["['change_playername'] + 1"],"destinations":["playername"]}}"
+add container text App playername oldname 2 0 '{"x":30,"y":50,"model":{"text":"oldname:{0}","data":["['player_names'][ablauf.Data.session['change_playername']]"],"destinations":["playername"]}}"
+add container text App playername newname 3 0 '{"x":30,"y":70,"model":{"text":"newname:{0}","data":["['new_playername']"],"destinations":["playername"]}}"
+
+add container add_char App playername playernamechar1 4 0 '{"x":30,"y":100,"navigation":{"down":"playername_dialog/playernamechar11","right":"playername_dialog/playernamechar2"},"model":{"text":"1","data":[],"bind":"new_playername","char":"1","destinations":["playername"]}}'
+add container add_char App playername playernamechar2 5 0 '{"x":60,"y":100,"navigation":{"down":"playername_dialog/playernamechar12","left":"playername_dialog/playernamechar1","right":"playername_dialog/playernamechar3"}, "model":{"text":"2","data":[],"bind":"new_playername","char":"2","destinations":["playername"]}}'
+add container add_char App playername playernamechar3 6 0 '{"x":90,"y":100,"navigation":{"down":"playername_dialog/playernamechar13","left":"playername_dialog/playernamechar2","right":"playername_dialog/playernamechar4"}, "model":{"text":"3","data":[],"bind":"new_playername","char":"3","destinations":["playername"]}}'
+add container add_char App playername playernamechar4 7 0 '{"x":120,"y":100,"navigation":{"down":"playername_dialog/playernamechar14","left":"playername_dialog/playernamechar3","right":"playername_dialog/playernamechar5"}, "model":{"text":"4","data":[],"bind":"new_playername","char":"4","destinations":["playername"]}}'
+add container add_char App playername playernamechar5 8 0 '{"x":150,"y":100,"navigation":{"down":"playername_dialog/playernamechar15","left":"playername_dialog/playernamechar4","right":"playername_dialog/playernamechar6"}, "model":{"text":"5","data":[],"bind":"new_playername","char":"5","destinations":["playername"]}}'
+add container add_char App playername playernamechar6 9 0 '{"x":180,"y":100,"navigation":{"down":"playername_dialog/playernamechar16","left":"playername_dialog/playernamechar5","right":"playername_dialog/playernamechar7"}, "model":{"text":"6","data":[],"bind":"new_playername","char":"6","destinations":["playername"]}}'
+add container add_char App playername playernamechar7 10 0 '{"x":210,"y":100,"navigation":{"down":"playername_dialog/playernamechar17","left":"playername_dialog/playernamechar6","right":"playername_dialog/playernamechar8"}, "model":{"text":"7","data":[],"bind":"new_playername","char":"7","destinations":["playername"]}}'
+add container add_char App playername playernamechar8 11 0 '{"x":240,"y":100,"navigation":{"down":"playername_dialog/playernamechar18","left":"playername_dialog/playernamechar7","right":"playername_dialog/playernamechar9"}, "model":{"text":"8","data":[],"bind":"new_playername","char":"8","destinations":["playername"]}}'
+add container add_char App playername playernamechar9 12 0 '{"x":270,"y":100,"navigation":{"down":"playername_dialog/playernamechar19","left":"playername_dialog/playernamechar8","right":"playername_dialog/playernamechar10"}, "model":{"text":"9","data":[],"bind":"new_playername","char":"9","destinations":["playername"]}}'
+add container add_char App playername playernamechar10 13 0 '{"x":300,"y":100,"navigation":{"down":"playername_dialog/playernamechar20","left":"playername_dialog/playernamechar9","right":"playername_dialog/playernamechar11"}, "model":{"text":"0","data":[],"bind":"new_playername","char":"0","destinations":["playername"]}}'
+
+add container add_char App playername playernamechar11 14 0 '{"x":30,"y":120,"navigation":{"up":"playername_dialog/playernamechar1","down":"playername_dialog/playernamechar21","left":"playername_dialog/playernamechar10","right":"playername_dialog/playernamechar12"}, "model":{"text":"A","data":[],"bind":"new_playername","char":"A","destinations":["playername"]}}'
+add container add_char App playername playernamechar12 15 0 '{"x":60,"y":120,"navigation":{"up":"playername_dialog/playernamechar2","down":"playername_dialog/playernamechar22","left":"playername_dialog/playernamechar11","right":"playername_dialog/playernamechar13"}, "model":{"text":"B","data":[],"bind":"new_playername","char":"B","destinations":["playername"]}}'
+add container add_char App playername playernamechar13 16 0 '{"x":90,"y":120,"navigation":{"up":"playername_dialog/playernamechar3","down":"playername_dialog/playernamechar23","left":"playername_dialog/playernamechar12","right":"playername_dialog/playernamechar14"}, "model":{"text":"C","data":[],"bind":"new_playername","char":"C","destinations":["playername"]}}'
+add container add_char App playername playernamechar14 17 0 '{"x":120,"y":120,"navigation":{"up":"playername_dialog/playernamechar4","down":"playername_dialog/playernamechar24","left":"playername_dialog/playernamechar13","right":"playername_dialog/playernamechar15"}, "model":{"text":"D","data":[],"bind":"new_playername","char":"D","destinations":["playername"]}}'
+add container add_char App playername playernamechar15 18 0 '{"x":150,"y":120,"navigation":{"up":"playername_dialog/playernamechar5","down":"playername_dialog/playernamechar25","left":"playername_dialog/playernamechar14","right":"playername_dialog/playernamechar16"}, "model":{"text":"E","data":[],"bind":"new_playername","char":"E","destinations":["playername"]}}'
+add container add_char App playername playernamechar16 19 0 '{"x":180,"y":120,"navigation":{"up":"playername_dialog/playernamechar6","down":"playername_dialog/playernamechar26","left":"playername_dialog/playernamechar15","right":"playername_dialog/playernamechar17"}, "model":{"text":"F","data":[],"bind":"new_playername","char":"F","destinations":["playername"]}}'
+add container add_char App playername playernamechar17 20 0 '{"x":210,"y":120,"navigation":{"up":"playername_dialog/playernamechar7","down":"playername_dialog/playernamechar27","left":"playername_dialog/playernamechar16","right":"playername_dialog/playernamechar18"}, "model":{"text":"G","data":[],"bind":"new_playername","char":"G","destinations":["playername"]}}'
+add container add_char App playername playernamechar18 21 0 '{"x":240,"y":120,"navigation":{"up":"playername_dialog/playernamechar8","down":"playername_dialog/playernamechar28","left":"playername_dialog/playernamechar17","right":"playername_dialog/playernamechar19"}, "model":{"text":"H","data":[],"bind":"new_playername","char":"H","destinations":["playername"]}}'
+add container add_char App playername playernamechar19 22 0 '{"x":270,"y":120,"navigation":{"up":"playername_dialog/playernamechar9","down":"playername_dialog/playernamechar29","left":"playername_dialog/playernamechar18","right":"playername_dialog/playernamechar20"}, "model":{"text":"I","data":[],"bind":"new_playername","char":"I","destinations":["playername"]}}'
+add container add_char App playername playernamechar20 23 0 '{"x":300,"y":120,"navigation":{"up":"playername_dialog/playernamechar10","down":"playername_dialog/playernamechar30","left":"playername_dialog/playernamechar19","right":"playername_dialog/playernamechar21"}, "model":{"text":"J","data":[],"bind":"new_playername","char":"J","destinations":["playername"]}}'
+add container add_char App playername playernamechar21 24 0 '{"x":30,"y":140,"navigation":{"up":"playername_dialog/playernamechar11","down":"playername_dialog/playernamechar31","left":"playername_dialog/playernamechar20","right":"playername_dialog/playernamechar22"}, "model":{"text":"K","data":[],"bind":"new_playername","char":"K","destinations":["playername"]}}'
+add container add_char App playername playernamechar22 25 0 '{"x":60,"y":140,"navigation":{"up":"playername_dialog/playernamechar12","down":"playername_dialog/playernamechar32","left":"playername_dialog/playernamechar21","right":"playername_dialog/playernamechar23"}, "model":{"text":"L","data":[],"bind":"new_playername","char":"L","destinations":["playername"]}}'
+add container add_char App playername playernamechar23 26 0 '{"x":90,"y":140,"navigation":{"up":"playername_dialog/playernamechar13","down":"playername_dialog/playernamechar33","left":"playername_dialog/playernamechar22","right":"playername_dialog/playernamechar24"}, "model":{"text":"M","data":[],"bind":"new_playername","char":"M","destinations":["playername"]}}'
+add container add_char App playername playernamechar24 27 0 '{"x":120,"y":140,"navigation":{"up":"playername_dialog/playernamechar14","down":"playername_dialog/playernamechar34","left":"playername_dialog/playernamechar23","right":"playername_dialog/playernamechar25"}, "model":{"text":"N","data":[],"bind":"new_playername","char":"N","destinations":["playername"]}}'
+add container add_char App playername playernamechar25 28 0 '{"x":150,"y":140,"navigation":{"up":"playername_dialog/playernamechar15","down":"playername_dialog/playernamechar35","left":"playername_dialog/playernamechar24","right":"playername_dialog/playernamechar26"}, "model":{"text":"O","data":[],"bind":"new_playername","char":"O","destinations":["playername"]}}'
+add container add_char App playername playernamechar26 29 0 '{"x":180,"y":140,"navigation":{"up":"playername_dialog/playernamechar16","down":"playername_dialog/playernamechar36","left":"playername_dialog/playernamechar25","right":"playername_dialog/playernamechar27"}, "model":{"text":"P","data":[],"bind":"new_playername","char":"P","destinations":["playername"]}}'
+add container add_char App playername playernamechar27 30 0 '{"x":210,"y":140,"navigation":{"up":"playername_dialog/playernamechar17","down":"playername_dialog/playernamechar37","left":"playername_dialog/playernamechar26","right":"playername_dialog/playernamechar28"}, "model":{"text":"Q","data":[],"bind":"new_playername","char":"Q","destinations":["playername"]}}'
+add container add_char App playername playernamechar28 31 0 '{"x":240,"y":140,"navigation":{"up":"playername_dialog/playernamechar18","down":"playername_dialog/playernamechar38","left":"playername_dialog/playernamechar27","right":"playername_dialog/playernamechar29"}, "model":{"text":"R","data":[],"bind":"new_playername","char":"R","destinations":["playername"]}}'
+add container add_char App playername playernamechar29 32 0 '{"x":270,"y":140,"navigation":{"up":"playername_dialog/playernamechar19","down":"playername_dialog/playernamechar39","left":"playername_dialog/playernamechar28","right":"playername_dialog/playernamechar30"}, "model":{"text":"S","data":[],"bind":"new_playername","char":"S","destinations":["playername"]}}'
+add container add_char App playername playernamechar30 33 0 '{"x":300,"y":140,"navigation":{"up":"playername_dialog/playernamechar20","down":"playername_dialog/playernamechar40","left":"playername_dialog/playernamechar29","right":"playername_dialog/playernamechar31"}, "model":{"text":"T","data":[],"bind":"new_playername","char":"T","destinations":["playername"]}}'
+
+add container add_char App playername playernamechar31 34 0 '{"x":30,"y":160,"navigation":{"up":"playername_dialog/playernamechar21","down":"playername_dialog/backspace","left":"playername_dialog/playernamechar30","right":"playername_dialog/playernamechar32"}, "model":{"text":"U","bind":"new_playername","char":"U","destinations":["playername"]}}'
+add container add_char App playername playernamechar32 35 0 '{"x":60,"y":160,"navigation":{"up":"playername_dialog/playernamechar22","down":"playername_dialog/backspace","left":"playername_dialog/playernamechar31","right":"playername_dialog/playernamechar33"}, "model":{"text":"V","data":[],"bind":"new_playername","char":"V","destinations":["playername"]}}'
+add container add_char App playername playernamechar33 36 0 '{"x":90,"y":160,"navigation":{"up":"playername_dialog/playernamechar23","down":"playername_dialog/backspace","left":"playername_dialog/playernamechar32","right":"playername_dialog/playernamechar34"}, "model":{"text":"W","data":[],"bind":"new_playername","char":"W","destinations":["playername"]}}'
+add container add_char App playername playernamechar34 37 0 '{"x":120,"y":160,"navigation":{"up":"playername_dialog/playernamechar24","down":"playername_dialog/backspace","left":"playername_dialog/playernamechar33","right":"playername_dialog/playernamechar35"}, "model":{"text":"X","data":[],"bind":"new_playername","char":"X","destinations":["playername"]}}'
+add container add_char App playername playernamechar35 38 0 '{"x":150,"y":160,"navigation":{"up":"playername_dialog/playernamechar25","down":"playername_dialog/backspace","left":"playername_dialog/playernamechar34","right":"playername_dialog/playernamechar36"}, "model":{"text":"Y","data":[],"bind":"new_playername","char":"Y","destinations":["playername"]}}'
+add container add_char App playername playernamechar36 39 0 '{"x":180,"y":160,"navigation":{"up":"playername_dialog/playernamechar26","down":"playername_dialog/backspace","left":"playername_dialog/playernamechar35","right":"playername_dialog/playernamechar37"}, "model":{"text":"Z","data":[],"bind":"new_playername","char":"Z","destinations":["playername"]}}'
+add container add_char App playername playernamechar37 40 0 '{"x":210,"y":160,"navigation":{"up":"playername_dialog/playernamechar27","down":"playername_dialog/backspace","left":"playername_dialog/playernamechar36","right":"playername_dialog/playernamechar38"}, "model":{"text":"-","data":[],"bind":"new_playername","char":"-","destinations":["playername"]}}'
+add container add_char App playername playernamechar38 41 0 '{"x":240,"y":160,"navigation":{"up":"playername_dialog/playernamechar28","down":"playername_dialog/backspace","left":"playername_dialog/playernamechar37","right":"playername_dialog/playernamechar39"}, "model":{"text":"_","data":[],"bind":"new_playername","char":"_","destinations":["playername"]}}'
+add container add_char App playername playernamechar39 42 0 '{"x":270,"y":160,"navigation":{"up":"playername_dialog/playernamechar29","down":"playername_dialog/backspace","left":"playername_dialog/playernamechar38","right":"playername_dialog/playernamechar40"}, "model":{"text":".","data":[],"bind":"new_playername","char":".","destinations":["playername"]}}'
+add container add_char App playername playernamechar40 43 0 '{"x":300,"y":160,"navigation":{"up":"playername_dialog/playernamechar30","down":"playername_dialog/backspace","left":"playername_dialog/playernamechar39","right":"playername_dialog/backspace"}, "model":{"text":"SP","data":[],"bind":"new_playername","char":" ","destinations":["playername"]}}'
+
+add container del_char App playername backspace 44 0 '{"x":30,"y":530,"navigation":{"up":"playername_dialog/playernamechar40","left":"playername_dialog/playernamechar40","right":"playername_dialog/exit"},"model":{"text":"<","bind":"new_playername","destinations":["players"]}}'
+add container jump App playername exit 45 0 '{"x":260,"y":530,"navigation":{"up":"playername_dialog/playernamechar40","left":"playername_dialog/backspace","right":"playername_dialog/ok"}, "model":{"text":"cancel","destinations":["players"]}}'
+add container jump App playername ok 46 0 '{"x":360,"y":530,"navigation":{"up":"playername_dialog/playernamechar40","left":"playername_dialog/exit"},"model":{"text":"ok","destinations":["players"],"mapping":[["['player_names'][ablauf.Data.session['change_playername']]","ablauf.Data.session['new_playername']"]]}}'
+
+# highscore
+# ------------------------------------------------------
+add container datagrid App highscore tournament 1 0 '{"model": { "data":"tournament","columns":"updown|last_place|place|ID|1|2|3|4|5|6|7|8|score|points","header":"ud|lp|pl|ID|1|2|3|4|5|6|7|8|score|points","x_header":"20|40|60|80|300|320|340|360|380|400|420|440|460|540","y_header":30,"x_data":"20|40|60|80|300|320|340|360|380|400|420|440|460|540","y_data":50,"y_offset":20, "sort_column":"place","reverse":false}}'
+add container datagrid App highscore scores 1 0 '{"model": { "data":"highscores","columns":"place|ID|score","header":"Place|Name|Score","x_header":"16|70|210","y_header":300,"x_data":"30|70|210","y_data":320,"y_offset":20}}'
+add container jump App highscore exit 1 0 '{"x":30,"y":530,"model":{"destinations":["menu"]}}'

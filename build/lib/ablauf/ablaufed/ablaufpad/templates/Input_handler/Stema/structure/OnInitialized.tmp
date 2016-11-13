@@ -1,0 +1,33 @@
+{
+  "name": "init_wait",
+  "x": 0,
+  "y": 0,
+  "rows": 1,
+  "visible_rows": 1,
+  "columns": 1,
+  "visible_columns": 1,
+  "x_offset": 0,
+  "y_offset": 0,
+  "input_mappings": [],
+  "children":
+  [
+    [
+      {
+        "name": "delay",
+        "x": 0,
+        "y": 0,
+        "rows": 1,
+        "visible_rows": 1,
+        "columns": 1,
+        "visible_columns": 1,
+        "x_offset": 0,
+        "y_offset": 0,
+        "input_mappings": [],
+        "children": [[]],
+        "actual_segment":0
+      }
+    ]
+  ],
+  "actual_segment":0,
+  "start_path" : "init_wait/delay/delay_0_0"
+}

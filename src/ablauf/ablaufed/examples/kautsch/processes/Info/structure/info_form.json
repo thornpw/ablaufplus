@@ -1,0 +1,289 @@
+{
+  "actual_segment": 0,
+  "rows": 1,
+  "name": "info_dialog",
+  "start_path": "info_dialog/info_button_panel/info_cancel/info_cancel_0_0",
+  "y_offset": 0,
+  "x_offset": 0,
+  "visible_columns": 1,
+  "y": 0,
+  "x": 0,
+  "visible_rows": 1,
+  "input_mappings": [],
+  "children": [
+    [
+      {
+        "actual_segment": 0,
+        "rows": 1,
+        "visible_rows": 1,
+        "name": "content",
+        "input_mappings": [
+          {
+            "Controller": "segment_left",
+            "Pad": null,
+            "Model": {},
+            "Key": "K_LEFT"
+          },
+          {
+            "Controller": "segment_right",
+            "Pad": null,
+            "Model": {},
+            "Key": "K_RIGHT"
+          },
+          {
+            "Controller": "segment_up",
+            "Pad": null,
+            "Model": {},
+            "Key": "K_UP"
+          },
+          {
+            "Controller": "segment_down",
+            "Pad": null,
+            "Model": {},
+            "Key": "K_DOWN"
+          },
+          {
+            "Controller": "game_page_down",
+            "Pad": "SHOULDER_L1",
+            "Model": {},
+            "Key": "K_a"
+          },
+          {
+            "Controller": "game_page_up",
+            "Pad": "SHOULDER_R1",
+            "Model": {},
+            "Key": "K_s"
+          },
+          {
+            "Controller": "button_down",
+            "Pad": "BUTTON_DOWN",
+            "Model": {},
+            "Key": "K_SPACE"
+          }
+        ],
+        "class": "Jump",
+        "polling": [
+        ],
+        "y_offset": 0,
+        "x_offset": 0,
+        "visible_columns": 1,
+        "y": 280,
+        "x": 180,
+        "model": {
+          "destinations": [
+            "library"
+          ]
+        },
+        "navigation": {},
+        "children": [],
+        "columns": 1
+      }
+    ],
+    [
+      {
+        "model": {},
+        "actual_segment": 1,
+        "rows": 1,
+        "name": "info_button_panel",
+        "navigation": {},
+        "children": [
+          [
+            {
+              "actual_segment": 0,
+              "rows": 1,
+              "visible_rows": 1,
+              "name": "info_ok",
+              "input_mappings": [
+                {
+                  "Controller": "segment_left",
+                  "Pad": null,
+                  "Model": {},
+                  "Key": "K_LEFT"
+                },
+                {
+                  "Controller": "segment_right",
+                  "Pad": null,
+                  "Model": {},
+                  "Key": "K_RIGHT"
+                },
+                {
+                  "Controller": "segment_up",
+                  "Pad": null,
+                  "Model": {},
+                  "Key": "K_UP"
+                },
+                {
+                  "Controller": "segment_down",
+                  "Pad": null,
+                  "Model": {},
+                  "Key": "K_DOWN"
+                },
+                {
+                  "Controller": "game_page_down",
+                  "Pad": "SHOULDER_L1",
+                  "Model": {},
+                  "Key": "K_a"
+                },
+                {
+                  "Controller": "game_page_up",
+                  "Pad": "SHOULDER_R1",
+                  "Model": {},
+                  "Key": "K_s"
+                },
+                {
+                  "Controller": "start_game",
+                  "Pad": "BUTTON_DOWN",
+                  "Model": {},
+                  "Key": "K_SPACE"
+                }
+              ],
+              "class": "Jump",
+              "y": 0,
+              "y_offset": 0,
+              "polling": [
+              ],
+              "visible_columns": 1,
+              "x_offset": 0,
+              "x": 596,
+              "model": {
+                "destinations": [
+                  "end"
+                ]
+              },
+              "navigation": {
+                "right": "info_dialog/info_button_panel/info_cancel"
+              },
+              "children": [],
+              "columns": 1
+            }
+          ],
+          [
+            {
+              "model": {
+                "destinations": [
+                  "end"
+                ]
+              },
+              "actual_segment": 0,
+              "rows": 1,
+              "name": "info_cancel",
+              "navigation": {
+                "left": "info_dialog/info_button_panel/info_ok"
+              },
+              "children": [],
+              "polling": [
+              ],
+              "y_offset": 0,
+              "x_offset": 0,
+              "x": 630,
+              "y": 0,
+              "visible_columns": 1,
+              "visible_rows": 1,
+              "input_mappings": [
+                {
+                  "Controller": "segment_left",
+                  "Pad": null,
+                  "Model": {},
+                  "Key": "K_LEFT"
+                },
+                {
+                  "Controller": "segment_right",
+                  "Pad": null,
+                  "Model": {},
+                  "Key": "K_RIGHT"
+                },
+                {
+                  "Controller": "segment_up",
+                  "Pad": null,
+                  "Model": {},
+                  "Key": "K_UP"
+                },
+                {
+                  "Controller": "segment_down",
+                  "Pad": null,
+                  "Model": {},
+                  "Key": "K_DOWN"
+                },
+                {
+                  "Controller": "game_page_down",
+                  "Pad": "SHOULDER_L1",
+                  "Model": {},
+                  "Key": "K_a"
+                },
+                {
+                  "Controller": "game_page_up",
+                  "Pad": "SHOULDER_R1",
+                  "Model": {},
+                  "Key": "K_s"
+                },
+                {
+                  "Controller": "button_down",
+                  "Pad": "BUTTON_DOWN",
+                  "Model": {},
+                  "Key": "K_SPACE"
+                }
+              ],
+              "class": "Jump",
+              "columns": 1
+            }
+          ]
+        ],
+        "x_offset": 110,
+        "y_offset": 0,
+        "polling": [
+        ],
+        "x": 190,
+        "y": 290,
+        "visible_columns": 1,
+        "visible_rows": 1,
+        "input_mappings": [
+          {
+            "Controller": "segment_left",
+            "Pad": null,
+            "Model": {},
+            "Key": "K_LEFT"
+          },
+          {
+            "Controller": "segment_right",
+            "Pad": null,
+            "Model": {},
+            "Key": "K_RIGHT"
+          },
+          {
+            "Controller": "segment_up",
+            "Pad": null,
+            "Model": {},
+            "Key": "K_UP"
+          },
+          {
+            "Controller": "segment_down",
+            "Pad": null,
+            "Model": {},
+            "Key": "K_DOWN"
+          },
+          {
+            "Controller": "game_page_down",
+            "Pad": "SHOULDER_L1",
+            "Model": {},
+            "Key": "K_a"
+          },
+          {
+            "Controller": "game_page_up",
+            "Pad": "SHOULDER_R1",
+            "Model": {},
+            "Key": "K_s"
+          },
+          {
+            "Controller": "button_down",
+            "Pad": "BUTTON_DOWN",
+            "Model": {},
+            "Key": "K_SPACE"
+          }
+        ],
+        "class": "Jump",
+        "columns": 1
+      }
+    ]
+  ],
+  "columns": 1
+}

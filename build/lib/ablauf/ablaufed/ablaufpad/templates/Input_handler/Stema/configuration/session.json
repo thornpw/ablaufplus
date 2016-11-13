@@ -1,0 +1,19 @@
+{
+  "actual_action": null,
+  "is_waiting": false,
+  "home": "/home/thorsten/.kautsch",
+  "DelayInit": 10,
+  "tag_names_players_filter": "",
+  "mapping_database_status": false,
+  "DelayMappingAction": 1,
+  "DelaySteps": 6,
+  "number_of_controllers": 0,
+   "action_status": [],
+  "actual_action_status": "",
+  "DelayUnknown": 10,
+  "DelayExit": 10,
+  "tag_names_names_filter": "",
+  "stema_status": null,
+  "actual_controller": null,
+  "controllers_status": []
+}

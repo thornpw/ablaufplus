@@ -1,0 +1,38 @@
+    # <ab> start container id: {{containername}}
+    def render_{{containername}}(self, segment):
+        if segment.key == self.model.actual_path:
+            _color = self.model.color_selected
+        else:
+            _color = self.model.color_text
+
+        #data
+        xpositions_data = segment.model["x_data"]
+        xpositions_data = xpositions_data.split("|")
+
+        # header
+        xpositions_header = segment.model["x_header"]
+        xpositions_header = xpositions_header.split("|")
+
+        _counter = 0
+        for _header_part in segment.model["header"].split("|"):
+            ablauf.pygamekern.utils.scalable_text(_header_part, int(xpositions_header[_counter]), segment.model["y_header"] , None, 20, _color)
+            _counter += 1
+
+        if ("sort_column" in segment.model) and ("reverse" in segment.model):
+            #_sorted = sorted( ablauf.Data.session[segment.model['data']], key=lambda score: int(score[segment.model['sort_column']]), reverse=True )
+            _sorted = sorted( ablauf.Data.session[segment.model['data']], key=lambda score: int(score[segment.model['sort_column']]), reverse=segment.model['reverse'])
+        else:
+            _sorted =  ablauf.Data.session[segment.model['data']]
+
+        # data
+        _row_counter = 0
+        for _row in _sorted:
+            _column_counter = 0
+            for _column in segment.model['columns'].split("|"):
+                ablauf.pygamekern.utils.scalable_text(str(_row[_column]), int(xpositions_data[_column_counter]), segment.model["y_data"] + (_row_counter * segment.model["y_offset"]) , None, 20, _color)
+                _column_counter += 1
+            _row_counter += 1
+
+    # <ab> end container id: {{containername}}
+
+

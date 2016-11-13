@@ -1,0 +1,14 @@
+{
+  "actual_segment": 0,
+  "rows": 1,
+  "name": "innen",
+  "y_offset": 0,
+  "x_offset": 0,
+  "visible_columns": 1,
+  "y": 0,
+  "x": 0,
+  "visible_rows": 1,
+  "input_mappings": [],
+  "children": [],
+  "columns": 1
+}

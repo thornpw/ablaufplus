@@ -1,0 +1,219 @@
+{
+  "actual_segment": 0,
+  "rows": 1,
+  "name": "library_dialog",
+  "input_mappings": [
+    {
+      "Controller": "Controller.jump",
+      "Pad": "BUTTON_SELECT",
+      "Model": {
+        "destination": "Filter"
+      },
+      "Key": "K_w"
+    }
+  ],
+  "y_offset": 0,
+  "x_offset": 0,
+  "x": 0,
+  "y": 0,
+  "visible_columns": 1,
+  "visible_rows": 1,
+  "start_path": "library_dialog/game/game_0_0",
+  "children": [
+    [
+      {
+        "model": {},
+        "actual_segment": 0,
+        "rows": 1,
+        "name": "config",
+        "navigation": {
+          "down": "library_dialog/game",
+          "right": "library_dialog/quit"
+        },
+        "children": [],
+        "x_offset": 34,
+        "y_offset": 0,
+        "polling": [
+        ],
+        "x": 972,
+        "y": 10,
+        "visible_columns": 1,
+        "visible_rows": 1,
+        "input_mappings": [
+          {
+            "Controller": "segment_left",
+            "Pad": null,
+            "Model": {},
+            "Key": "K_LEFT"
+          },
+          {
+            "Controller": "segment_right",
+            "Pad": null,
+            "Model": {},
+            "Key": "K_RIGHT"
+          },
+          {
+            "Controller": "segment_up",
+            "Pad": null,
+            "Model": {},
+            "Key": "K_UP"
+          },
+          {
+            "Controller": "segment_down",
+            "Pad": null,
+            "Model": {},
+            "Key": "K_DOWN"
+          },
+          {
+            "Controller": "button_down",
+            "Pad": "BUTTON_DOWN",
+            "Model": {},
+            "Key": "K_SPACE"
+          }
+        ],
+        "class": "Jump",
+        "columns": 1
+      },
+      {
+        "actual_segment": 0,
+        "rows": 1,
+        "name": "quit",
+        "navigation": {
+          "down": "library_dialog/game",
+          "left": "library_dialog/config",
+          "right": "library_dialog/game"
+        },
+        "children": [],
+        "x_offset": 34,
+        "y_offset": 0,
+        "polling": [
+        ],
+        "x": 1006,
+        "y": 10,
+        "visible_columns": 1,
+        "visible_rows": 1,
+        "input_mappings": [
+          {
+            "Controller": "segment_left",
+            "Pad": null,
+            "Model": {},
+            "Key": "K_LEFT"
+          },
+          {
+            "Controller": "segment_right",
+            "Pad": null,
+            "Model": {},
+            "Key": "K_RIGHT"
+          },
+          {
+            "Controller": "segment_up",
+            "Pad": null,
+            "Model": {},
+            "Key": "K_UP"
+          },
+          {
+            "Controller": "segment_down",
+            "Pad": null,
+            "Model": {},
+            "Key": "K_DOWN"
+          },
+          {
+            "Controller": "game_page_down",
+            "Pad": "SHOULDER_L1",
+            "Model": {},
+            "Key": "K_a"
+          },
+          {
+            "Controller": "game_page_up",
+            "Pad": "SHOULDER_R1",
+            "Model": {},
+            "Key": "K_s"
+          },
+          {
+            "Controller": "button_down",
+            "Pad": "BUTTON_DOWN",
+            "Model": {},
+            "Key": "K_SPACE"
+          }
+        ],
+        "class": "Jump",
+        "columns": 1,
+        "model": {
+          "destinations": [
+            "end"
+          ]
+        }
+      }
+    ],
+    [
+      {
+        "actual_segment": 0,
+        "rows": 3,
+        "visible_rows": 3,
+        "name": "game",
+        "data": "game",
+        "input_mappings": [
+          {
+            "Controller": "segment_left",
+            "Pad": null,
+            "Model": {},
+            "Key": "K_LEFT"
+          },
+          {
+            "Controller": "segment_right",
+            "Pad": null,
+            "Model": {},
+            "Key": "K_RIGHT"
+          },
+          {
+            "Controller": "segment_up",
+            "Pad": null,
+            "Model": {},
+            "Key": "K_UP"
+          },
+          {
+            "Controller": "segment_down",
+            "Pad": null,
+            "Model": {},
+            "Key": "K_DOWN"
+          },
+          {
+            "Controller": "game_page_down",
+            "Pad": "SHOULDER_L1",
+            "Model": {},
+            "Key": "K_a"
+          },
+          {
+            "Controller": "game_page_up",
+            "Pad": "SHOULDER_R1",
+            "Model": {},
+            "Key": "K_s"
+          },
+          {
+            "Controller": "show_info",
+            "Pad": "BUTTON_DOWN",
+            "Model": {},
+            "Key": "K_SPACE"
+          }
+        ],
+        "class": "Jump",
+        "y": 50,
+        "y_offset": 240,
+        "polling": [
+        ],
+        "visible_columns": 3,
+        "x_offset": 340,
+        "x": 20,
+        "model": {
+        },
+        "navigation": {
+          "up": "library_dialog/quit",
+          "left": "library_dialog/quit"
+        },
+        "children": [],
+        "columns": 3
+      }
+    ]
+  ],
+  "columns": 1
+}

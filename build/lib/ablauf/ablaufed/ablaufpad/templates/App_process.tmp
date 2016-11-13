@@ -1,0 +1,8 @@
+{
+  "namespace": "app", "states":
+  [
+    {"name": "Init", "type": "Task",
+      "exit_transition": {"type": "Jump","destination": "{{first_state}}"}
+    }
+  ]
+}
